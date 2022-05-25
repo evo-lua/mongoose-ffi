@@ -1,6 +1,7 @@
 LIBRARY mongoose_ffi
 EXPORTS
-	Mongoose_CreateHttpServer
+	MongooseEventManager_CreateHttpServer
+	MongooseEventManager_PollOnceWithTimeout
 	Mongoose_CreateWebSocketServer
 	Mongoose_CreateTcpServer
 	Mongoose_CreateUdpServer

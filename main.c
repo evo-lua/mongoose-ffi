@@ -64,6 +64,8 @@ static void fn(MongooseConnection *connection, int event, void *eventData, void 
 
 
   printf("OnMongooseEvent: %s\n", GetMongooseEventName(event));
+      printf("Waiting..."); (void) 2000; printf("OK!\n");
+
   if (event == MG_EV_HTTP_MSG) mg_http_serve_dir(connection, eventData, &opts);
 }
 
@@ -74,5 +76,5 @@ int main() {
   struct mg_mgr mgr;
   mg_mgr_init(&mgr);
   mg_http_listen(&mgr, "0.0.0.0:8000", fn, NULL);     // Create listening connection
-  for (;;) mg_mgr_poll(&mgr, 1000);                   // Block forever
+  for (;;) mg_mgr_poll(&mgr, 5000);                   // Block forever
 }

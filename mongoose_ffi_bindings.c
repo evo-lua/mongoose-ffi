@@ -2,12 +2,23 @@
 
 #include <stdio.h>
 
+#define DEBUG_MODE 1
+
+
 // The readability of C programs clearly could be improved with saner naming schemes...
 typedef struct mg_addr MongooseNetworkAddress;
 typedef struct mg_mgr MongooseEventManager;
 typedef struct mg_connection MongooseConnection;
 
 typedef char* String;
+
+static void DEBUG(String message) {
+#ifdef DEBUG_MODE
+	printf("[DEBUG] %s\n", message);
+#endif
+
+};
+
 
 static String GetMongooseEventName(int enumValue) {
 	switch (enumValue)
@@ -56,33 +67,105 @@ static String GetMongooseEventName(int enumValue) {
 	return "UNKNOWN_EVENT";
 }
 
-typedef struct {
+typedef struct MongooseEvent {
 	int eventTypeID;
-	// TBD: Redundant, eliminate and use LUT in Lua?
-	String eventName;
-	void* eventArguments; // Also needs a LUT since the types are different...
+	void* eventArguments;
+	struct MongooseEvent* nextEvent;
 } MongooseEvent;
 
-typedef struct {
-	int numEvents;
-	MongooseEvent** events; // TBD Does that work with the args being void pointers? Maybe not, could use fixed event types, one per enum value
+typedef struct EventQueue {
+	MongooseEvent* firstEvent;
+	MongooseEvent* lastEvent;
 } EventQueue;
 
+MongooseEvent* EventQueue_GetFront(EventQueue* eventQueue) {
+	DEBUG("EventQueue_GetFront");
 
-static void OnMongooseEvent(MongooseConnection *connection, int event, void *eventData, void *userData) {
+	MongooseEvent* event;
+	if((event = eventQueue->firstEvent) != NULL) {
+		eventQueue->firstEvent = event->nextEvent;
+	}
+
+	return eventQueue->firstEvent;
+}
+
+void MongooseEvent_DebugPrint(MongooseEvent* event) {
+	DEBUG(GetMongooseEventName(event->eventTypeID));
+}
+
+void EventQueue_PrintEvents(EventQueue* eventQueue) {
+	DEBUG("EventQueue_PrintEvents");
+
+	if(eventQueue->firstEvent == NULL) DEBUG("Event Queue is empty!");
+
+	MongooseEvent* event = eventQueue->firstEvent;
+	while(event != NULL) {
+		MongooseEvent_DebugPrint(event);
+		event = event->nextEvent;
+	}
+}
+
+bool EventQueue_PushBack(EventQueue* eventQueue, MongooseEvent* event) {
+	DEBUG("EventQueue_PushBack");
+
+	// List is empty -> new event is first and last
+	if(eventQueue->firstEvent == NULL) {
+		eventQueue->firstEvent = event;
+	}
+
+	if(eventQueue->lastEvent == NULL) {
+		eventQueue->lastEvent = event;
+	}
+
+	// List has two or more elements -> new event should be appended
+	eventQueue->lastEvent->nextEvent = event;
+
+	return true;
+}
+
+static void OnMongooseEvent(MongooseConnection *connection, int eventID, void *eventData, void *userData) {
+	// DEBUG("OnMongooseEvent");
+
   struct mg_http_serve_opts opts = {.root_dir = "."};   // Serve local dir
 
 
-  printf("OnMongooseEvent: %s\n", GetMongooseEventName(event));
-  if (event == MG_EV_HTTP_MSG) mg_http_serve_dir(connection, eventData, &opts);
+	// switch(event) {
+		// case ... :
+	// }
+
+	EventQueue* eventQueue = (EventQueue*) userData;
+	EventQueue_PrintEvents(eventQueue);
+  	printf("OnMongooseEvent: %s\n", GetMongooseEventName(eventID));
+
+
+	MongooseEvent* newEvent = malloc(sizeof(MongooseEvent));
+	newEvent->eventTypeID = eventID;
+	newEvent->eventArguments = eventData;
+	EventQueue_PushBack(eventQueue, newEvent);
+
+  if (eventID == MG_EV_HTTP_MSG) mg_http_serve_dir(connection, eventData, &opts);
 }
 
 // FFI Exports: These functions should be exposed to Lua
-void Mongoose_CreateHttpServer() {
-  struct mg_mgr mgr;
-  mg_mgr_init(&mgr);
-  mg_http_listen(&mgr, "0.0.0.0:8000", OnMongooseEvent, NULL);     // Create listening connection
-  for (;;) mg_mgr_poll(&mgr, 1000);                   // Block forever
+MongooseEventManager MongooseEventManager_CreateHttpServer() {
+
+	DEBUG("MongooseEventManager_CreateHttpServer");
+
+	struct mg_mgr mgr;
+
+	EventQueue eventQueue;
+	eventQueue.firstEvent= NULL;
+	eventQueue.lastEvent= NULL;
+
+	mg_mgr_init(&mgr);
+	mg_http_listen(&mgr, "0.0.0.0:8000", OnMongooseEvent, &eventQueue);     // Create listening connection
+  //for (;;) mg_mgr_poll(&mgr, 1000);                   // Block forever
+	return mgr;
+}
+
+void MongooseEventManager_PollOnceWithTimeout(MongooseEventManager eventManager, int timeoutInMilliseconds) {
+	DEBUG("MongooseEventManager_PollOnceWithTimeout");
+	mg_mgr_poll(&eventManager, timeoutInMilliseconds);
 }
 
 // TBD Maybe expose all the structs and let Lua handle this?
@@ -90,7 +173,8 @@ void Mongoose_CreateWebSocketServer() {}
 void Mongoose_CreateTcpServer() {}
 void Mongoose_CreateUdpServer() {}
 
-
+// GetSocketEvents(mgr)
+// iterate through list until next is NULL
 
 // int main() {
 
