@@ -53,7 +53,7 @@ static String GetMongooseEventName(int enumValue) {
 // };
       /* etc... */
    }
-	return "Test";
+	return "UNKNOWN_EVENT";
 }
 
 typedef struct {
