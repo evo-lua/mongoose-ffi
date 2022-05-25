@@ -78,7 +78,7 @@ static void OnMongooseEvent(MongooseConnection *connection, int event, void *eve
 }
 
 // FFI Exports: These functions should be exposed to Lua
-void CreateHttpServer() {
+void Mongoose_CreateHttpServer() {
   struct mg_mgr mgr;
   mg_mgr_init(&mgr);
   mg_http_listen(&mgr, "0.0.0.0:8000", OnMongooseEvent, NULL);     // Create listening connection
@@ -86,9 +86,9 @@ void CreateHttpServer() {
 }
 
 // TBD Maybe expose all the structs and let Lua handle this?
-void CreateWebSocketServer() {}
-void CreateTcpServer() {}
-void CreateUdpServer() {}
+void Mongoose_CreateWebSocketServer() {}
+void Mongoose_CreateTcpServer() {}
+void Mongoose_CreateUdpServer() {}
 
 
 

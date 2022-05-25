@@ -1,0 +1,6 @@
+LIBRARY mongoose_ffi
+EXPORTS
+	Mongoose_CreateHttpServer
+	Mongoose_CreateWebSocketServer
+	Mongoose_CreateTcpServer
+	Mongoose_CreateUdpServer
