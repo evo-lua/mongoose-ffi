@@ -79,7 +79,10 @@ static void OnMongooseEvent(MongooseConnection *connection, int event, void *eve
 
 // FFI Exports: These functions should be exposed to Lua
 void CreateHttpServer() {
-
+  struct mg_mgr mgr;
+  mg_mgr_init(&mgr);
+  mg_http_listen(&mgr, "0.0.0.0:8000", OnMongooseEvent, NULL);     // Create listening connection
+  for (;;) mg_mgr_poll(&mgr, 1000);                   // Block forever
 }
 
 // TBD Maybe expose all the structs and let Lua handle this?
