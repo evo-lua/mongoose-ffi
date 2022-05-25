@@ -46,6 +46,7 @@ static void TestEventQueue() {
 	printf("Testing %s\n", "EventQueue_Initialize"); // implicit
 	assert(queue.firstEvent == NULL, "should initialize first element with NULL");
 	assert(queue.lastEvent == NULL, "should initialize last element with NULL");
+	assert(EventQueue_GetNumEvents(&queue) == 0, "should return 0 when no events have been added");
 
 	// GetFront
 	printf("Testing %s\n", "EventQueue_GetFront");
@@ -60,6 +61,15 @@ static void TestEventQueue() {
 	assert(queue.firstEvent == &event1, "should set the first element if only one event was added");
 	assert(queue.lastEvent == &event1, "should set the last element if only one event was added");
 	assert(EventQueue_GetFront(&queue) == &event1, "should return the first element if only one was added");
+	assert(EventQueue_GetNumEvents(&queue) == 1, "should return 1 when only one event was added");
+
+	MongooseEvent event2;
+	memset(&event2, 0, sizeof(MongooseEvent));
+	EventQueue_PushBack(&queue, &event2);
+	assert(queue.firstEvent == &event1, "should leave the first event untouched if more events are added");
+	assert(queue.lastEvent == &event2, "should update the last element whenever new events are added");
+	assert(EventQueue_GetFront(&queue) == &event1, "should return the first element if more events are added");
+	assert(EventQueue_GetNumEvents(&queue) == 2, "should return 2 when two events were added");
 
 }
 

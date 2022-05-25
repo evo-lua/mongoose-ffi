@@ -75,6 +75,20 @@ MongooseEvent* EventQueue_GetFront(EventQueue* eventQueue) {
 	return eventQueue->firstEvent;
 }
 
+int EventQueue_GetNumEvents(EventQueue* eventQueue) {
+	int count = 42;
+
+	// if(eventQueue->firstEvent == NULL) DEBUG("Event Queue is empty!");
+
+	// MongooseEvent* event = eventQueue->firstEvent;
+	// while(event != NULL) {
+	// 	MongooseEvent_DebugPrint(event);
+	// 	event = event->nextEvent;
+	// }
+
+	return count;
+}
+
 void MongooseEvent_DebugPrint(MongooseEvent* event) {
 	DEBUG(GetMongooseEventName(event->eventTypeID));
 }
