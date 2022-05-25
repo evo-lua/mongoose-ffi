@@ -1,38 +1,52 @@
 /* file minunit_example.c */
 
  #include <stdio.h>
- #include "minunit.h"
+
+ typedef char * String;
+ typedef int bool;
+
+#define true 1
+#define false 0
+
+static bool assert(bool condition, String message)
+{
+	if (!condition) {
+		printf("FAIL\t %s\n", message);
+		return true;
+	}
+
+	printf("OK\t %s\n", message);
+	return false;
+}
+
 
  int tests_run = 0;
 
  int foo = 7;
  int bar = 4;
 
- static char * test_foo() {
-     mu_assert("error, foo != 7", foo == 7);
+
+ static String test_foo() {
+     assert(foo == 7, "foo should be 7");
      return 0;
  }
 
- static char * test_bar() {
-     mu_assert("error, bar != 5", bar == 5);
+ static String test_bar() {
+     assert(bar == 5, "bar should be 5");
      return 0;
  }
 
- static char * all_tests() {
-     mu_run_test(test_foo);
-     mu_run_test(test_bar);
-     return 0;
+ static String run_all_tests() {
+	test_foo();
+	test_bar();
+	return 0;
  }
 
- int main(int argc, char **argv) {
-     char *result = all_tests();
+ int main() {
+     String result = run_all_tests();
      if (result != 0) {
-         printf("%s\n", result);
+         printf("FAIL\t%s\n", result);
      }
-     else {
-         printf("ALL TESTS PASSED\n");
-     }
-     printf("Tests run: %d\n", tests_run);
 
      return result != 0;
  }
