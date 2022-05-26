@@ -112,6 +112,10 @@ mongoose.cdefs = [[
 
 		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+		struct mg_str {
+			const char *ptr;  // Pointer to string data
+			size_t len;       // String len
+		  };
 		struct mg_str mg_str_s(const char *s);
 
 		void mg_mgr_poll(struct mg_mgr *, int ms);
