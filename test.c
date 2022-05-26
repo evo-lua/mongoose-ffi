@@ -65,9 +65,24 @@ static void TestEventQueue() {
 	assert(EventQueue_GetFront(&queue) == &event1, "should return the first element if only one was added");
 
 	MongooseEvent event2;
+	EventQueue_PushBack(&queue, &event1); // Since it was previously removed we have to add it back or the head is NULL
 	memset(&event2, 0, sizeof(MongooseEvent));
+
+	// TODO move to EventQueue_Dump
+	printf("1st event: %llx\n", (LONG_PTR) &event1);
+	printf("2nd event: %llx\n", (LONG_PTR) &event2);
+	printf("Queue.head: %llx\n", (LONG_PTR) queue.firstEvent);
+	printf("Queue.tail: %llx\n", (LONG_PTR) queue.lastEvent);
+
 	EventQueue_PushBack(&queue, &event2);
-	assert(queue.firstEvent == &event1, "should leave the first event untouched if more events are added");
+
+	// TODO move to EventQueue_Dump
+	printf("1st event: %llx\n", (LONG_PTR) &event1);
+	printf("2nd event: %llx\n", (LONG_PTR) &event2);
+	printf("Queue.head: %llx\n", (LONG_PTR) queue.firstEvent);
+	printf("Queue.tail: %llx\n", (LONG_PTR) queue.lastEvent);
+
+	assert(queue.firstEvent == &event1, "should leave the first event in place if more events are added");
 	assert(queue.lastEvent == &event2, "should update the last element whenever new events are added");
 	assert(queue.firstEvent->nextEvent == &event2, "should set the event's next pointer to the second event");
 	assert(queue.firstEvent->nextEvent->nextEvent == NULL, "should set the next event's next pointer to NULL");
