@@ -122,3 +122,19 @@ bool EventQueue_PushBack(EventQueue* eventQueue, MongooseEvent* event) {
 
 	return true;
 }
+
+void EventQueue_Dump(EventQueue* eventQueue) {
+	printf("Dumping Event Queue...\n");
+	printf("Queue.head: %llx\n", (LONG_PTR) eventQueue->firstEvent);
+	printf("Queue.tail: %llx\n", (LONG_PTR) eventQueue->lastEvent);
+	printf("\n");
+}
+
+void Event_Dump(MongooseEvent* event) {
+	printf("Dumping Event...\n");
+	printf("Pointer Address: %llx\n", (LONG_PTR) &event);
+	printf("Event Type ID: %d\n", event->eventTypeID);
+	printf("Event Data Pointer Address: %llx\n", (LONG_PTR) &event->eventArguments);
+	printf("Next Event Pointer Address: %llx\n", (LONG_PTR) &event->nextEvent);
+	printf("\n");
+}

@@ -68,19 +68,19 @@ static void TestEventQueue() {
 	EventQueue_PushBack(&queue, &event1); // Since it was previously removed we have to add it back or the head is NULL
 	memset(&event2, 0, sizeof(MongooseEvent));
 
-	// TODO move to EventQueue_Dump
+	Event_Dump(&event1);
+	Event_Dump(&event2);
 	printf("1st event: %llx\n", (LONG_PTR) &event1);
 	printf("2nd event: %llx\n", (LONG_PTR) &event2);
-	printf("Queue.head: %llx\n", (LONG_PTR) queue.firstEvent);
-	printf("Queue.tail: %llx\n", (LONG_PTR) queue.lastEvent);
+	EventQueue_Dump(&queue);
 
 	EventQueue_PushBack(&queue, &event2);
 
-	// TODO move to EventQueue_Dump
 	printf("1st event: %llx\n", (LONG_PTR) &event1);
 	printf("2nd event: %llx\n", (LONG_PTR) &event2);
-	printf("Queue.head: %llx\n", (LONG_PTR) queue.firstEvent);
-	printf("Queue.tail: %llx\n", (LONG_PTR) queue.lastEvent);
+	Event_Dump(&event1);
+	Event_Dump(&event2);
+	EventQueue_Dump(&queue);
 
 	assert(queue.firstEvent == &event1, "should leave the first event in place if more events are added");
 	assert(queue.lastEvent == &event2, "should update the last element whenever new events are added");
@@ -99,5 +99,5 @@ test_bar();
 int main() {
 	TestEventQueue();
 	// run_all_tests();
-	printf("EventQueue\tDONE\n");
+	printf("\nDONE\tEventQueue\n");
 }
