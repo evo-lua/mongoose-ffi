@@ -104,6 +104,7 @@ local mongoose = {
 		void MongooseEventManager_PollOnceWithTimeout(MongooseEventManager eventManager, int timeoutInMilliseconds);
 		//MongooseEvent MongooseEventManager_GetNextQueuedEvent();
 		String MongooseEvent_GetName(int enumValue);
+		int MongooseEventList_Delete(MongooseEvent* head, MongooseEvent* elementToDelete);
 	]]
 }
 
@@ -125,8 +126,9 @@ while true do
 		-- print(type(connection.next))
 		print("Processing queued events for connection " .. tonumber(connection.id))
 
-		local nextEvent = ffi.cast("MongooseEvent*", connection.fn_data)
-
+		-- Needed to later delete entries from the list, after processing the event
+		local listHead = ffi.cast("MongooseEvent*", connection.fn_data)
+		local nextEvent =  listHead
 		while(nextEvent ~= nil) do
 
 			print("Dumping event cdata (don't try this at home)")
@@ -136,10 +138,18 @@ while true do
 			print(nextEvent.next)
 			print(nextEvent.prev)
 
+			print("Deleting event")
+			-- We must not delete the list head, as without it no new events can be added
+			if nextEvent ~= listHead then
+				bindings.MongooseEventList_Delete(listHead, nextEvent)
+			 end
+			print("Deleted event")
+
 			nextEvent = nextEvent.next
 		end
 
 		print("Processed queued events for connection " .. tonumber(connection.id))
+
 		connection = connection.next
 	end
 

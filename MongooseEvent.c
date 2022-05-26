@@ -37,10 +37,19 @@ String MongooseEvent_GetName(int enumValue) {
 }
 
 int MongooseEventList_Delete(MongooseEvent* head, MongooseEvent* elementToDelete) {
+	if(head == NULL) return 0;
+	if(elementToDelete == NULL) return 0;
+	if(head == elementToDelete)
+	{
+		head = NULL;
+		// Memory release should be done explicitly, by freeing the list head after it's no longer used
+		return 0;
+	}
+
 	DL_DELETE(head,elementToDelete);
     free(elementToDelete);
 
-	return 1;
+	return 0;
 }
 
 // MongooseEventQueue?
