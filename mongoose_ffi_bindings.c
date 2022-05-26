@@ -1,6 +1,7 @@
 #include "mongoose/mongoose.h"
 
 #include <stdio.h>
+#include "utlist.h"
 
 
 // The readability of C programs clearly could be improved with saner naming schemes...
@@ -11,35 +12,36 @@ typedef struct mg_connection MongooseConnection;
 typedef char* String;
 
 
-
-
-#include "EventQueue.c"
+// #include "EventQueue.c"
+#include "MongooseEvent.c"
 #include "debug.h"
 
 static void OnMongooseEvent(MongooseConnection *connection, int eventID, void *eventData, void *userData) {
-	// DEBUG("OnMongooseEvent");
+	struct mg_http_serve_opts opts = {.root_dir = "."};   // Serve local dir
 
-  struct mg_http_serve_opts opts = {.root_dir = "."};   // Serve local dir
-
-
-	// switch(event) {
-		// case ... :
-	// }
-
-  	printf("OnMongooseEvent: %s\n", GetMongooseEventName(eventID));
-
+  	printf("OnMongooseEvent: %s\n", MongooseEvent_GetName(eventID));
 
 	if(eventID == MG_EV_POLL) return; // Not relevant
 
-	EventQueue* eventQueue = (EventQueue*) userData;
-	EventQueue_PrintEvents(eventQueue);
+
+	// TODO Ensure they are always freed (valgrind + tests / actions workflow)
+	MongooseEvent* listHead = (MongooseEvent*) userData; // From MongooseEventManager_CreateHttpServer
+	MongooseEvent* newEvent = (MongooseEvent *) malloc(sizeof(MongooseEvent));
+	if(newEvent == NULL) {
+		printf("Fatal error: Failed to allocate memory for MongooseEvent! Exiting...\n");
+		exit(EXIT_FAILURE);
+	}
 
 	// MongooseEvent* newEvent = malloc(sizeof(MongooseEvent));
-	MongooseEvent* newEvent = malloc(sizeof(MongooseEvent));
 	newEvent->eventTypeID = eventID;
 	newEvent->eventArguments = eventData;
-	EventQueue_PushBack(eventQueue, newEvent);
-	EventQueue_PrintEvents(eventQueue);
+	DL_PREPEND(listHead, newEvent); // The queue is FIFO, but we can only get the head in constant time... so new events must go first
+
+	// TODO Remove after debugging/writing tests, move to dump function (MongooseEventQueue_Dump)
+	MongooseEvent* elt;
+	DL_FOREACH(listHead,elt) printf("Event Type ID: %d\n", elt->eventTypeID);
+	int count;
+    DL_COUNT(listHead, elt, count);
 
   if (eventID == MG_EV_HTTP_MSG) mg_http_serve_dir(connection, eventData, &opts);
 }
@@ -51,12 +53,14 @@ MongooseEventManager MongooseEventManager_CreateHttpServer() {
 
 	struct mg_mgr mgr;
 
-	EventQueue eventQueue;
-	eventQueue.firstEvent= NULL;
-	eventQueue.lastEvent= NULL;
+	// EventQueue eventQueue;
+	// eventQueue.firstEvent= NULL;
+	// eventQueue.lastEvent= NULL;
+
+	MongooseEvent* eventList = MongooseEventList_Construct();
 
 	mg_mgr_init(&mgr);
-	mg_http_listen(&mgr, "0.0.0.0:8000", OnMongooseEvent, &eventQueue);     // Create listening connection
+	mg_http_listen(&mgr, "0.0.0.0:8000", OnMongooseEvent, eventList);     // Create listening connection
 //   for (;;) mg_mgr_poll(&mgr, 1000);                   // Block forever
 	return mgr;
 }

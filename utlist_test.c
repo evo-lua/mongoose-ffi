@@ -5,6 +5,11 @@
 
 #define BUFLEN 20
 
+
+typedef struct _mongoose_event {
+
+} mongoose_event;
+
 typedef struct el {
     char bname[BUFLEN];
     struct el *next, *prev;
@@ -16,7 +21,7 @@ int namecmp(el *a, el *b) {
 
 el *head = NULL; /* important- initialize to NULL! */
 
-int main(int argc, char *argv[]) {
+int notmain(int argc, char *argv[]) {
     el *name, *elt, *tmp, etmp;
 
     char linebuf[BUFLEN];
