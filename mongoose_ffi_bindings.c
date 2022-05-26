@@ -38,7 +38,7 @@ static void OnMongooseEvent(MongooseConnection *connection, int eventID, void *e
 
 	// TODO Remove after debugging/writing tests, move to dump function (MongooseEventQueue_Dump)
 	MongooseEvent* elt;
-	DL_FOREACH(listHead,elt) printf("[DL_FOREACH] Event Type ID: %d (%s)\n", elt->eventTypeID, MongooseEvent_GetName(eventID));
+	DL_FOREACH(listHead,elt) printf("[DL_FOREACH] Event Type ID: %d (%s)\n", elt->eventTypeID, MongooseEvent_GetName(elt->eventTypeID));
 	int count;
     DL_COUNT(listHead, elt, count);
 	DL_FOREACH(listHead,elt) printf("[DL_COUNT] Number of Queued Events: %d\n", count);
