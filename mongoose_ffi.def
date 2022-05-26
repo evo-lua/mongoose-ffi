@@ -7,3 +7,6 @@ EXPORTS
 	Mongoose_CreateWebSocketServer
 	Mongoose_CreateTcpServer
 	Mongoose_CreateUdpServer
+	mg_mgr_init
+	mg_http_listen
+	mg_mgr_poll

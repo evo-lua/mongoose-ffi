@@ -105,59 +105,78 @@ local mongoose = {
 		//MongooseEvent MongooseEventManager_GetNextQueuedEvent();
 		String MongooseEvent_GetName(int enumValue);
 		int MongooseEventList_Delete(MongooseEvent* head, MongooseEvent* elementToDelete);
+
+		/////////////////////////////////////////////////////////////////
+
+		void mg_mgr_init(struct mg_mgr *);
+		struct mg_connection *mg_http_listen(struct mg_mgr *, const char *url,
+                                     mg_event_handler_t fn, void *fn_data);
+		void mg_mgr_poll(struct mg_mgr *, int ms);
+		// TBD mg_mgr_free ?
 	]]
 }
 
+local function onMongooseEventCallbackFunction()
+	print("OnMongooseEvent")
+end
+
 ffi.cdef(mongoose.cdefs)
 
-local server = bindings.MongooseEventManager_CreateHttpServer()
+local mongooseEventManager = ffi.new("struct mg_mgr");
+bindings.mg_mgr_init(mongooseEventManager);
+bindings.mg_http_listen(mongooseEventManager, "0.0.0.0:8000", onMongooseEventCallbackFunction, nil);
 while true do
-	bindings.MongooseEventManager_PollOnceWithTimeout(server, 1000)
-	-- local event = bindings.MongooseEventManager_GetNextQueuedEvent(server)
-
-	-- Process queued events for all active connections
-	local connections = server.conns
-	local connection = connections
-	while connection ~= nil do
-
-		-- print(connection == nil)
-		-- print(type(connection))
-		-- print(connection.next == nil)
-		-- print(type(connection.next))
-		print("Processing queued events for connection " .. tonumber(connection.id))
-
-		-- Needed to later delete entries from the list, after processing the event
-		local listHead = ffi.cast("MongooseEvent*", connection.fn_data)
-		local nextEvent =  listHead
-		while(nextEvent ~= nil) do
-
-			print("Dumping event cdata (don't try this at home)")
-			print(nextEvent.eventTypeID)
-			print(ffi.string(bindings.MongooseEvent_GetName(nextEvent.eventTypeID)))
-			print(nextEvent.eventArguments)
-			print(nextEvent.next)
-			print(nextEvent.prev)
-
-			print("Deleting event")
-			-- We must not delete the list head, as without it no new events can be added
-			if nextEvent ~= listHead then
-				bindings.MongooseEventList_Delete(listHead, nextEvent)
-			 end
-			print("Deleted event")
-
-			nextEvent = nextEvent.next
-		end
-
-		print("Processed queued events for connection " .. tonumber(connection.id))
-
-		connection = connection.next
-	end
-
-	-- local eventID = tonumber(event.eventTypeID)
-	-- local eventArgs = "TODO"
-	-- print("Detected new event: " .. eventID .. " (Args: " .. eventArgs .. ")")
-
-	-- Remove from event queue
-
-	print("Polling loop finished")
+	bindings.mg_mgr_poll(mongooseEventManager, 1000);
 end
+
+-- local server = bindings.MongooseEventManager_CreateHttpServer()
+-- while true do
+-- 	bindings.MongooseEventManager_PollOnceWithTimeout(server, 1000)
+-- 	-- local event = bindings.MongooseEventManager_GetNextQueuedEvent(server)
+
+-- 	-- Process queued events for all active connections
+-- 	local connections = server.conns
+-- 	local connection = connections
+-- 	while connection ~= nil do
+
+-- 		-- print(connection == nil)
+-- 		-- print(type(connection))
+-- 		-- print(connection.next == nil)
+-- 		-- print(type(connection.next))
+-- 		print("Processing queued events for connection " .. tonumber(connection.id))
+
+-- 		-- Needed to later delete entries from the list, after processing the event
+-- 		local listHead = ffi.cast("MongooseEvent*", connection.fn_data)
+-- 		local nextEvent =  listHead
+-- 		while(nextEvent ~= nil) do
+
+-- 			print("Dumping event cdata (don't try this at home)")
+-- 			print(nextEvent.eventTypeID)
+-- 			print(ffi.string(bindings.MongooseEvent_GetName(nextEvent.eventTypeID)))
+-- 			print(nextEvent.eventArguments)
+-- 			print(nextEvent.next)
+-- 			print(nextEvent.prev)
+
+-- 			print("Deleting event")
+-- 			-- We must not delete the list head, as without it no new events can be added
+-- 			if nextEvent ~= listHead then
+-- 				bindings.MongooseEventList_Delete(listHead, nextEvent)
+-- 			 end
+-- 			print("Deleted event")
+
+-- 			nextEvent = nextEvent.next
+-- 		end
+
+-- 		print("Processed queued events for connection " .. tonumber(connection.id))
+
+-- 		connection = connection.next
+-- 	end
+
+-- 	-- local eventID = tonumber(event.eventTypeID)
+-- 	-- local eventArgs = "TODO"
+-- 	-- print("Detected new event: " .. eventID .. " (Args: " .. eventArgs .. ")")
+
+-- 	-- Remove from event queue
+
+-- 	print("Polling loop finished")
+-- end
