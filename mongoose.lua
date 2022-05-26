@@ -112,6 +112,8 @@ mongoose.cdefs = [[
 
 		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+		struct mg_str mg_str_s(const char *s);
+
 		void mg_mgr_poll(struct mg_mgr *, int ms);
 		void mg_mgr_init(struct mg_mgr *);
 		void mg_mgr_free(struct mg_mgr *);
@@ -201,7 +203,7 @@ void mg_http_serve_file(struct mg_connection *, struct mg_http_message *hm,
 		char *mg_hex(const void *buf, size_t len, char *dst);
 		void mg_unhex(const char *buf, size_t len, unsigned char *to);
 		unsigned long mg_unhexn(const char *s, size_t len);
-		size_t mg_asprintf(char **, size_t, const char *fmt, ...) PRINTF_LIKE(3, 4);
+		size_t mg_asprintf(char **, size_t, const char *fmt, ...);
 		size_t mg_vasprintf(char **buf, size_t size, const char *fmt, va_list ap);
 		size_t mg_vsnprintf(char *buf, size_t len, const char *fmt, va_list ap);
 		size_t mg_snprintf(char *, size_t, const char *fmt, ...);

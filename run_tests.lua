@@ -150,7 +150,7 @@ end
 
 function TestSuite:TestExportedApiSurfaceIsPresent()
 
-	local EXPECTED_NUM_FUNCTIONS = 42
+	local EXPECTED_NUM_FUNCTIONS = 109
 	local numFunctionsExported = 0
 
 	for _, exportedFunctionName in ipairs(exportedApiSurface) do
