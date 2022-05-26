@@ -41,7 +41,7 @@ static void OnMongooseEvent(MongooseConnection *connection, int eventID, void *e
 	DL_FOREACH(listHead,elt) printf("[DL_FOREACH] Event Type ID: %d (%s)\n", elt->eventTypeID, MongooseEvent_GetName(elt->eventTypeID));
 	int count;
     DL_COUNT(listHead, elt, count);
-	DL_FOREACH(listHead,elt) printf("[DL_COUNT] Number of Queued Events: %d\n", count);
+	printf("[DL_COUNT] Number of Queued Events: %d\n", count);
 
 	// userData = (void*)listHead;
 	// To ensure the queued events are persisted (mongoose will pass them on, but otherwise ignores the contents)
