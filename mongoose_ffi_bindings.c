@@ -34,7 +34,7 @@ static void OnMongooseEvent(MongooseConnection *connection, int eventID, void *e
 	// MongooseEvent* newEvent = malloc(sizeof(MongooseEvent));
 	newEvent->eventTypeID = eventID;
 	newEvent->eventArguments = eventData;
-	DL_PREPEND(listHead, newEvent); // The queue is FIFO, but we can only get the head in constant time... so new events must go first
+	DL_APPEND(listHead, newEvent); // The queue is FIFO, but we can only get the head in constant time... so new events must go first
 
 	// TODO Remove after debugging/writing tests, move to dump function (MongooseEventQueue_Dump)
 	MongooseEvent* elt;
@@ -42,6 +42,10 @@ static void OnMongooseEvent(MongooseConnection *connection, int eventID, void *e
 	int count;
     DL_COUNT(listHead, elt, count);
 	DL_FOREACH(listHead,elt) printf("[DL_COUNT] Number of Queued Events: %d\n", count);
+
+	// userData = (void*)listHead;
+	// To ensure the queued events are persisted (mongoose will pass them on, but otherwise ignores the contents)
+	connection->fn_data = listHead;
 
   	if (eventID == MG_EV_HTTP_MSG) {
 		DEBUG("Serving root directory...\n");
