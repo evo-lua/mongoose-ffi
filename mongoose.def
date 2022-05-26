@@ -46,6 +46,7 @@ EXPORTS
 	mg_mqtt_ping
 	mg_mqtt_parse
 	mg_tls_init
+	mg_tls_free
 	mg_timer_add
 	mg_timer_init
 	mg_timer_free
@@ -91,7 +92,6 @@ EXPORTS
 	mg_random
 	mg_ntohs
 	mg_ntohl
-	mg_ntohs
 	mg_crc32
 	mg_check_ip_acl
 	mg_url_decode
