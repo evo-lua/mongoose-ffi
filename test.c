@@ -60,16 +60,19 @@ static void TestEventQueue() {
 	EventQueue_PushBack(&queue, &event1);
 	assert(queue.firstEvent == &event1, "should set the first element if only one event was added");
 	assert(queue.lastEvent == &event1, "should set the last element if only one event was added");
-	assert(EventQueue_GetFront(&queue) == &event1, "should return the first element if only one was added");
+	assert(queue.firstEvent->nextEvent == NULL, "should set the event's next pointer to NULL if no other events were added");
 	assert(EventQueue_GetNumEvents(&queue) == 1, "should return 1 when only one event was added");
+	assert(EventQueue_GetFront(&queue) == &event1, "should return the first element if only one was added");
 
 	MongooseEvent event2;
 	memset(&event2, 0, sizeof(MongooseEvent));
 	EventQueue_PushBack(&queue, &event2);
 	assert(queue.firstEvent == &event1, "should leave the first event untouched if more events are added");
 	assert(queue.lastEvent == &event2, "should update the last element whenever new events are added");
-	assert(EventQueue_GetFront(&queue) == &event1, "should return the first element if more events are added");
+	assert(queue.firstEvent->nextEvent == &event2, "should set the event's next pointer to the second event");
+	assert(queue.firstEvent->nextEvent->nextEvent == NULL, "should set the next event's next pointer to NULL");
 	assert(EventQueue_GetNumEvents(&queue) == 2, "should return 2 when two events were added");
+	assert(EventQueue_GetFront(&queue) == &event1, "should return the first element if more events are added");
 
 }
 
@@ -81,4 +84,5 @@ test_bar();
 int main() {
 	TestEventQueue();
 	// run_all_tests();
+	printf("EventQueue\tDONE\n");
 }

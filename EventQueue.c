@@ -72,19 +72,20 @@ MongooseEvent* EventQueue_GetFront(EventQueue* eventQueue) {
 		eventQueue->firstEvent = event->nextEvent;
 	}
 
-	return eventQueue->firstEvent;
+	return event;
 }
 
 int EventQueue_GetNumEvents(EventQueue* eventQueue) {
-	int count = 42;
+	int count = 0;
 
-	// if(eventQueue->firstEvent == NULL) DEBUG("Event Queue is empty!");
+	if(eventQueue->firstEvent == NULL) return 0;
 
-	// MongooseEvent* event = eventQueue->firstEvent;
-	// while(event != NULL) {
-	// 	MongooseEvent_DebugPrint(event);
-	// 	event = event->nextEvent;
-	// }
+	MongooseEvent* event = eventQueue->firstEvent;
+	while(event != NULL) {
+		count++;
+		// printf("%llx\n", (LONG64) event->nextEvent);
+		event = event->nextEvent;
+	}
 
 	return count;
 }
@@ -111,10 +112,8 @@ bool EventQueue_PushBack(EventQueue* eventQueue, MongooseEvent* event) {
 	// List is empty -> new event is first and last
 	if(eventQueue->firstEvent == NULL) {
 		eventQueue->firstEvent = event;
-	}
-
-	if(eventQueue->lastEvent == NULL) {
 		eventQueue->lastEvent = event;
+		return true;
 	}
 
 	// List has two or more elements -> new event should be appended
