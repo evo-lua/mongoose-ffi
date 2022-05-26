@@ -259,7 +259,6 @@ void mg_http_serve_file(struct mg_connection *, struct mg_http_message *hm,
 		void mg_hexdump(const void *buf, size_t len);
 ]]
 
-
 ffi.cdef(mongoose.cdefs)
 
 return mongoose
