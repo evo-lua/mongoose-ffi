@@ -26,15 +26,20 @@ static void OnMongooseEvent(MongooseConnection *connection, int eventID, void *e
 		// case ... :
 	// }
 
-	EventQueue* eventQueue = (EventQueue*) userData;
-	EventQueue_PrintEvents(eventQueue);
   	printf("OnMongooseEvent: %s\n", GetMongooseEventName(eventID));
 
 
+	if(eventID == MG_EV_POLL) return; // Not relevant
+
+	EventQueue* eventQueue = (EventQueue*) userData;
+	EventQueue_PrintEvents(eventQueue);
+
+	// MongooseEvent* newEvent = malloc(sizeof(MongooseEvent));
 	MongooseEvent* newEvent = malloc(sizeof(MongooseEvent));
 	newEvent->eventTypeID = eventID;
 	newEvent->eventArguments = eventData;
 	EventQueue_PushBack(eventQueue, newEvent);
+	EventQueue_PrintEvents(eventQueue);
 
   if (eventID == MG_EV_HTTP_MSG) mg_http_serve_dir(connection, eventData, &opts);
 }
@@ -52,7 +57,7 @@ MongooseEventManager MongooseEventManager_CreateHttpServer() {
 
 	mg_mgr_init(&mgr);
 	mg_http_listen(&mgr, "0.0.0.0:8000", OnMongooseEvent, &eventQueue);     // Create listening connection
-  //for (;;) mg_mgr_poll(&mgr, 1000);                   // Block forever
+//   for (;;) mg_mgr_poll(&mgr, 1000);                   // Block forever
 	return mgr;
 }
 
