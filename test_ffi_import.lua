@@ -116,8 +116,8 @@ local mongoose = {
 	]]
 }
 
-local function onMongooseEventCallbackFunction()
-	print("OnMongooseEvent")
+local function onMongooseEventCallbackFunction(connection, eventID, eventData, userData)
+	print("OnMongooseEvent", tonumber(connection.id), tonumber(eventID))
 end
 
 ffi.cdef(mongoose.cdefs)
