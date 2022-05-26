@@ -1,4 +1,5 @@
 #include "mongoose/mongoose.h"
+#include "utlist.h"
 
 typedef char* String;
 
@@ -9,7 +10,7 @@ typedef struct MongooseEvent {
 	struct MongooseEvent* prev;
 } MongooseEvent;
 
-static String MongooseEvent_GetName(int enumValue) {
+String MongooseEvent_GetName(int enumValue) {
 	switch (enumValue)
    {
       case MG_EV_ERROR: return "MG_EV_ERROR";
@@ -33,6 +34,13 @@ static String MongooseEvent_GetName(int enumValue) {
       case MG_EV_USER: return "MG_EV_USER";
    }
 	return "UNKNOWN_EVENT";
+}
+
+int MongooseEventList_Delete(MongooseEvent* head, MongooseEvent* elementToDelete) {
+	DL_DELETE(head,elementToDelete);
+    free(elementToDelete);
+
+	return 1;
 }
 
 // MongooseEventQueue?

@@ -91,6 +91,7 @@ local mongoose = {
 		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 		typedef struct mg_mgr MongooseEventManager;
+		typedef char* String;
 
 		typedef struct MongooseEvent {
 			int eventTypeID;
@@ -102,6 +103,7 @@ local mongoose = {
 		MongooseEventManager MongooseEventManager_CreateHttpServer();
 		void MongooseEventManager_PollOnceWithTimeout(MongooseEventManager eventManager, int timeoutInMilliseconds);
 		//MongooseEvent MongooseEventManager_GetNextQueuedEvent();
+		String MongooseEvent_GetName(int enumValue);
 	]]
 }
 
@@ -128,7 +130,8 @@ while true do
 		while(nextEvent ~= nil) do
 
 			print("Dumping event cdata (don't try this at home)")
-			print(nextEvent.eventTypeID) -- TODO LUT
+			print(nextEvent.eventTypeID)
+			print(ffi.string(bindings.MongooseEvent_GetName(nextEvent.eventTypeID)))
 			print(nextEvent.eventArguments)
 			print(nextEvent.next)
 			print(nextEvent.prev)
