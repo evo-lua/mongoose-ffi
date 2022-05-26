@@ -36,9 +36,9 @@ static String MongooseEvent_GetName(int enumValue) {
 }
 
 // MongooseEventQueue?
-typedef struct MongooseEventList {
+// typedef struct MongooseEventList {
 
-} MongooseEventList;
+// } MongooseEventList;
 
 MongooseEvent* MongooseEventList_Construct() {
 	MongooseEvent* head = NULL; // utlist demands this

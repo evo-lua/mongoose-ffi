@@ -3,7 +3,6 @@
 #include <stdio.h>
 #include "utlist.h"
 
-
 // The readability of C programs clearly could be improved with saner naming schemes...
 typedef struct mg_addr MongooseNetworkAddress;
 typedef struct mg_mgr MongooseEventManager;
@@ -14,7 +13,7 @@ typedef char* String;
 
 // #include "EventQueue.c"
 #include "MongooseEvent.c"
-#include "debug.h"
+#include "debug.c"
 
 static void OnMongooseEvent(MongooseConnection *connection, int eventID, void *eventData, void *userData) {
 	struct mg_http_serve_opts opts = {.root_dir = "."};   // Serve local dir
