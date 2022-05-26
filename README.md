@@ -55,15 +55,6 @@ TODO
 
 TODO
 
-## How to: Build mongoose.dll on Windows
-
-0. Install nasm perl etc following the openssl docs
-1. Clone OpenSSL with git clone --recursive flag
-2. Configure by following their instructions
-3. build for your desired architecture using vs dev shell
-4. copy libcrypto.lib and libssl.lib in the root folder of mongoose-ffi
-5. run make.cmd, hopefully it should work
-
 ## How to: Integrate with libuv's Event Loop
 
 LibUV via luv, as used in the luvit and evo runtimes. Still requires polling
