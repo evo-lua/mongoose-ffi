@@ -18,7 +18,7 @@ typedef char* String;
 static void OnMongooseEvent(MongooseConnection *connection, int eventID, void *eventData, void *userData) {
 	struct mg_http_serve_opts opts = {.root_dir = "."};   // Serve local dir
 
-  	printf("OnMongooseEvent: %s\n", MongooseEvent_GetName(eventID));
+  	printf("Triggered OnMongooseEvent: %s\n", MongooseEvent_GetName(eventID));
 
 	if(eventID == MG_EV_POLL) return; // Not relevant
 
@@ -38,11 +38,16 @@ static void OnMongooseEvent(MongooseConnection *connection, int eventID, void *e
 
 	// TODO Remove after debugging/writing tests, move to dump function (MongooseEventQueue_Dump)
 	MongooseEvent* elt;
-	DL_FOREACH(listHead,elt) printf("Event Type ID: %d\n", elt->eventTypeID);
+	DL_FOREACH(listHead,elt) printf("[DL_FOREACH] Event Type ID: %d (%s)\n", elt->eventTypeID, MongooseEvent_GetName(eventID));
 	int count;
     DL_COUNT(listHead, elt, count);
+	DL_FOREACH(listHead,elt) printf("[DL_COUNT] Number of Queued Events: %d\n", count);
 
-  if (eventID == MG_EV_HTTP_MSG) mg_http_serve_dir(connection, eventData, &opts);
+  	if (eventID == MG_EV_HTTP_MSG) {
+		DEBUG("Serving root directory...\n");
+		  mg_http_serve_dir(connection, eventData, &opts);
+	}
+	DEBUG("OnMongooseEvent handling finished");
 }
 
 // FFI Exports: These functions should be exposed to Lua
