@@ -92,8 +92,16 @@ local mongoose = {
 
 		typedef struct mg_mgr MongooseEventManager;
 
+		typedef struct MongooseEvent {
+			int eventTypeID;
+			void* eventArguments;
+			struct MongooseEvent* next;
+			struct MongooseEvent* prev;
+		} MongooseEvent;
+
 		MongooseEventManager MongooseEventManager_CreateHttpServer();
 		void MongooseEventManager_PollOnceWithTimeout(MongooseEventManager eventManager, int timeoutInMilliseconds);
+		//MongooseEvent MongooseEventManager_GetNextQueuedEvent();
 	]]
 }
 
@@ -102,5 +110,41 @@ ffi.cdef(mongoose.cdefs)
 local server = bindings.MongooseEventManager_CreateHttpServer()
 while true do
 	bindings.MongooseEventManager_PollOnceWithTimeout(server, 1000)
+	-- local event = bindings.MongooseEventManager_GetNextQueuedEvent(server)
+
+	-- Process queued events for all active connections
+	local connections = server.conns
+	local connection = connections
+	while connection ~= nil do
+
+		-- print(connection == nil)
+		-- print(type(connection))
+		-- print(connection.next == nil)
+		-- print(type(connection.next))
+		print("Processing queued events for connection " .. tonumber(connection.id))
+
+		local nextEvent = ffi.cast("MongooseEvent*", connection.fn_data)
+
+		while(nextEvent ~= nil) do
+
+			print("Dumping event cdata (don't try this at home)")
+			print(nextEvent.eventTypeID) -- TODO LUT
+			print(nextEvent.eventArguments)
+			print(nextEvent.next)
+			print(nextEvent.prev)
+
+			nextEvent = nextEvent.next
+		end
+
+		print("Processed queued events for connection " .. tonumber(connection.id))
+		connection = connection.next
+	end
+
+	-- local eventID = tonumber(event.eventTypeID)
+	-- local eventArgs = "TODO"
+	-- print("Detected new event: " .. eventID .. " (Args: " .. eventArgs .. ")")
+
+	-- Remove from event queue
+
 	print("Polling loop finished")
 end

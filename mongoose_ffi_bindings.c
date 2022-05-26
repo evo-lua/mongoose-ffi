@@ -33,7 +33,7 @@ static void OnMongooseEvent(MongooseConnection *connection, int eventID, void *e
 
 	// MongooseEvent* newEvent = malloc(sizeof(MongooseEvent));
 	newEvent->eventTypeID = eventID;
-	newEvent->eventArguments = eventData;
+	newEvent->eventArguments = eventData; // TODO Always null? Test different event types
 	DL_APPEND(listHead, newEvent); // The queue is FIFO, but we can only get the head in constant time... so new events must go first
 
 	// TODO Remove after debugging/writing tests, move to dump function (MongooseEventQueue_Dump)
