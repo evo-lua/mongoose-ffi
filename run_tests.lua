@@ -128,6 +128,21 @@ function TestSuite:TestEventConstantsAreExported()
 
 end
 
+function TestSuite:TestLowLevelBindings()
+	print("TEST\tmongoose.lua (low-level bindings)")
+
+	self:TestEventConstantsAreExported()
+	self:TestExportedApiSurfaceIsPresent()
+
+	print("OK\tmongoose.lua (low-level bindings)\n")
+end
+
+function TestSuite:TestHighLevelAPI()
+	print("TEST\tLibMongoose.lua (high-level API)")
+
+	print("OK\tLibMongoose.lua (high-level API)\n")
+end
+
 function TestSuite:TestExportedApiSurfaceIsPresent()
 
 	local EXPECTED_NUM_FUNCTIONS = 109
@@ -145,10 +160,10 @@ function TestSuite:TestExportedApiSurfaceIsPresent()
 	end
 
 	function TestSuite:Run()
-		print("Running some basic sanity tests...")
+		print("Running some basic sanity tests...\n")
 
-		self:TestEventConstantsAreExported()
-		self:TestExportedApiSurfaceIsPresent()
+		self:TestLowLevelBindings()
+		self:TestHighLevelAPI()
 
 		print("All tests done!")
 end
