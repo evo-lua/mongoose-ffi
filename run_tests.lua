@@ -154,6 +154,7 @@ function TestSuite:TestHighLevelAPI()
 	print("TEST\tLibMongoose.lua (high-level API)")
 
 	self:TestHighLevelApiSurface()
+	self:TestHttpServerCreation()
 
 	print("OK\tLibMongoose.lua (high-level API)\n")
 end
@@ -172,6 +173,16 @@ function TestSuite:TestHighLevelApiSurface()
 		"Should export " .. EXPECTED_NUM_FUNCTIONS .. " functions (actual: " .. numFunctionsExported.. ")")
 
 		print("OK\tHigh-level API functions are exported")
+end
+
+function TestSuite:TestHttpServerCreation()
+	local port = 1234
+	local host = "0.0.0.0"
+
+	local server = LibMongoose:CreateHttpServer()
+	assert(not server.IsListening(), "Server should not be started automatically")
+	server:StartListening(port, host)
+	assert(server.IsListening(), "Server should be started manually")
 end
 
 function TestSuite:TestEventConstantsAreExported()
