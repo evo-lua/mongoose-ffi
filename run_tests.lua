@@ -1,24 +1,5 @@
 local mongoose = _G.import("mongoose.lua") -- Requires evo runtime, because I'm lazy
 
-local function test()
-
-	local ffi = require("ffi")
-
-	local function onMongooseEventCallbackFunction(connection, eventID, eventData, userData)
-		print("OnMongooseEvent", tonumber(connection.id), tonumber(eventID))
-	end
-
-
-	local mongooseEventManager = ffi.new("struct mg_mgr");
-	mongoose.bindings.mg_mgr_init(mongooseEventManager);
-	mongoose.bindings.mg_http_listen(mongooseEventManager, "0.0.0.0:8000", onMongooseEventCallbackFunction, nil);
-	while true do
-		mongoose.bindings.mg_mgr_poll(mongooseEventManager, 1000);
-	end
-
-end
-
-
 local exportedApiSurface = {
 	"mg_mgr_init",
 	"mg_mgr_poll",
@@ -131,7 +112,6 @@ local exportedApiSurface = {
 	"mg_hexdump",
 }
 
-
 local TestSuite = {}
 
 function TestSuite:TestEventConstantsAreExported()
@@ -144,7 +124,7 @@ function TestSuite:TestEventConstantsAreExported()
 	assert(#mongoose.events == EXPECTED_NUM_EVENTS,
 	"Should export " .. EXPECTED_NUM_EVENTS .. " events (actual: " .. #mongoose.events.. ")")
 
-	print("OK\tTestEventConstantsAreExported")
+	print("OK\tEvent constants are exported")
 
 end
 
@@ -161,7 +141,7 @@ function TestSuite:TestExportedApiSurfaceIsPresent()
 		assert(numFunctionsExported == EXPECTED_NUM_FUNCTIONS,
 		"Should export " .. EXPECTED_NUM_FUNCTIONS .. " functions (actual: " .. numFunctionsExported.. ")")
 
-		print("OK\tTestExportedApiSurfaceIsPresent")
+		print("OK\tAPI functions are exported")
 	end
 
 	function TestSuite:Run()
@@ -171,8 +151,6 @@ function TestSuite:TestExportedApiSurfaceIsPresent()
 		self:TestExportedApiSurfaceIsPresent()
 
 		print("All tests done!")
-
-	test() -- TODO Remove
 end
 
 TestSuite:Run()
