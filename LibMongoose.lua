@@ -1,3 +1,6 @@
+local mongoose = _G.import("./mongoose.lua")
+local bindings = mongoose.bindings
+
 local function test()
 
 	local ffi = require("ffi")
@@ -16,9 +19,41 @@ local function test()
 
 end
 
+local HttpServer = {}
+
+function HttpServer:Construct()
+	local instance = {}
+
+	local inheritanceMetatable = {
+		__index = HttpServer
+	}
+
+	setmetatable(instance, inheritanceMetatable)
+
+	instance.__className = "HttpServer"
+
+	return instance
+end
+
+function HttpServer:IsListening()
+
+end
+
+function HttpServer:StartListening(port, host)
+	port = port or 80
+	host = host or "0.0.0.0"
+end
+
+
 local LibMongoose = {}
 
-function LibMongoose:CreateHttpServer() end
+function LibMongoose:CreateHttpServer()
+
+	local server = HttpServer:Construct()
+
+	return server
+end
+
 function LibMongoose:CreateHttpsServer() end
 function LibMongoose:CreateWebSocketServer() end
 function LibMongoose:CreateSecureWebSocketServer() end
