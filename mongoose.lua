@@ -10,6 +10,7 @@ local bindings = ffi.load("mongoose" .. "." .. expectedFileExtension)
 local mongoose = {}
 mongoose.bindings = bindings
 
+-- EventTypeID:FriendlyName -- Description:eventData value type (passed as first parameter to the callback)
 mongoose.events = {
 	"MG_EV_ERROR",       -- Error                        char *error_message
 	"MG_EV_OPEN",        -- Connection created           NULL
