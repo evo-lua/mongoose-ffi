@@ -17,17 +17,15 @@ Everything else may require some glue code; I simply haven't had a need for it a
 
 ## Requirements
 
-LuaJIT FFI, Win, Unix officially supported. Everything else should also work, but can't be tested
+LuaJIT FFI, Win, Unix officially supported. Everything else should also work, but I can't test it on my machine.
 
 ## Security
 
-I can make no promises here, though the glue code is minimal and hopefully doesn't introduce security vulnerabilities.
+I can make no promises here, though the glue code is minimal and hopefully doesn't introduce security vulnerabilities. Bring your own security experts to be sure.
 
 ## Performance
 
-There's likely some overhead for using mongoose from Lua, even with LuaJIT.
-
-In particular, a more advanced allocator for the event queues that are introduced to faciliate the C-Lua interactions could be worthwhile. Benchmarks would be useful to determine potential bottlenecks. Since I'm not primarily a C programmer, someone more experienced would need to take a look at possible optimizations.
+There's likely some overhead for using mongoose from Lua, even with LuaJIT. I've no benchmarks to offer currently, however.
 
 ## How to: Create HTTP Server
 
@@ -79,11 +77,39 @@ LibUV via luv, as used in the luvit and evo runtimes. Still requires polling
 
 mongoose license, GPL or commercial. Glue code is whatever
 
+## Exported API
+
+These bindings consist of multiple abstraction layers so that you can choose whichever you prefer:
+
+* ``mongoose.lua`` are (very thin) Lua bindings mapping LuaJIT ``cdata`` and C APIs to Lua functions of the same name
+* ``LibMongoose.lua`` uses these bindings to provide a Lua-only convenience layer, which may or may not incur some overhead
+
+### Low-Level Bindings: mongoose.lua
+
+The low-level bindings export a table with the following fields:
+
+* ``mongoose.bindings`` exports the low-level C API, without changes or sanity checks of any kind (expect ``SEGFAULT`` when misused)
+* ``mongoose.events`` exports a lookup table for mapping the low-level (integer) event type IDs to a human-readable string for the type
+* ``mongoose.cdefs`` exports the C definitions as a ffi-loadable string, which is automatically loaded by the bindings
+
+They expect a ``mongoose.dll`` (Windows), ``mongoose.so`` (Linux), or ``mongoose.dylib`` file to be present in the same folder, and will attempt to load it via ``ffi.load()``.
+
+### High-Level API: LibMongoose.lua
+
+This module exports a somewhat-abstracted API for accessing some of the core functionality that ``mongoose`` provides:
+
+* HTTP Server
+* WebSocket Server
+* TLS/SSL encryption
+* Base64, CRC32, MD5, SHA1
+
+This obviously doesn't cover the entirety of what ``mongoose`` can do; I've simply added the APIs that I found most useful. If you need more than that, you can use the low-level bindings in ``mongoose.lua`` to implement it yourself, then please send a PR afterwards :)
+
 ## Backround Information
 
 This section explains how the interactions between mongoose and the FFI bindings work conceptually.
 
-## High-Level Overview
+### High-Level Overview
 
 The general approach to working with mongoose is as follows:
 
