@@ -115,7 +115,18 @@ local TestSuite = {
 		"mg_hexdump",
 	},
 	highlevelApiSurface = {
-
+		"CreateHttpServer",
+		"CreateHttpsServer",
+		"CreateWebSocketServer",
+		"CreateSecureWebSocketServer",
+		"CreateHttpServer",
+		"EncodeBase64",
+		"DecodeBase64",
+		"EncodeMD5",
+		"DecodeMD5",
+		"EncodeSHA1",
+		"DecodeSHA1",
+		"ComputeChecksum",
 	}
 
 }
@@ -134,7 +145,7 @@ function TestSuite:TestLowLevelBindings()
 	print("TEST\tmongoose.lua (low-level bindings)")
 
 	self:TestEventConstantsAreExported()
-	self:TestExportedApiSurfaceIsPresent()
+	self:TestLowLevelApiSurface()
 
 	print("OK\tmongoose.lua (low-level bindings)\n")
 end
@@ -142,18 +153,18 @@ end
 function TestSuite:TestHighLevelAPI()
 	print("TEST\tLibMongoose.lua (high-level API)")
 
-	self:TestHighlevelApiSurfaceIsPresent()
+	self:TestHighLevelApiSurface()
 
 	print("OK\tLibMongoose.lua (high-level API)\n")
 end
 
-function TestSuite:TestHighlevelApiSurfaceIsPresent()
+function TestSuite:TestHighLevelApiSurface()
 
-	local EXPECTED_NUM_FUNCTIONS = 0
+	local EXPECTED_NUM_FUNCTIONS = 12
 	local numFunctionsExported = 0
 
 	for _, exportedFunctionName in ipairs(self.highlevelApiSurface) do
-		assert(type(mongoose.bindings[exportedFunctionName]) == "function", "Should export function " .. exportedFunctionName)
+		assert(type(LibMongoose[exportedFunctionName]) == "function", "Should export function " .. exportedFunctionName)
 			numFunctionsExported = numFunctionsExported + 1
 		end
 
@@ -177,7 +188,7 @@ function TestSuite:TestEventConstantsAreExported()
 
 end
 
-function TestSuite:TestExportedApiSurfaceIsPresent()
+function TestSuite:TestLowLevelApiSurface()
 
 	local EXPECTED_NUM_FUNCTIONS = 109
 	local numFunctionsExported = 0

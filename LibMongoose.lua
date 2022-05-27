@@ -18,4 +18,17 @@ end
 
 local LibMongoose = {}
 
+function LibMongoose:CreateHttpServer() end
+function LibMongoose:CreateHttpsServer() end
+function LibMongoose:CreateWebSocketServer() end
+function LibMongoose:CreateSecureWebSocketServer() end
+function LibMongoose:CreateHttpServer() end
+function LibMongoose:EncodeBase64() end
+function LibMongoose:DecodeBase64() end
+function LibMongoose:EncodeMD5() end
+function LibMongoose:DecodeMD5() end
+function LibMongoose:EncodeSHA1() end
+function LibMongoose:DecodeSHA1() end
+function LibMongoose:ComputeChecksum() end
+
 return LibMongoose
