@@ -1,10 +1,15 @@
 local ffi = require("ffi")
 
 local isWindows = (ffi.os == "Windows")
+local isMac = (ffi.os == "OSX")
 
 local WINDOWS_SHARED_LIBRARY_EXTENSION = "dll"
+local OSX_SHARED_LIBRARY_EXTENSIONS = "dylib"
 local UNIX_SHARED_LIBRARY_EXTENSION = "so"
-local expectedFileExtension = isWindows and WINDOWS_SHARED_LIBRARY_EXTENSION or UNIX_SHARED_LIBRARY_EXTENSION
+local expectedFileExtension = (isWindows and WINDOWS_SHARED_LIBRARY_EXTENSION)
+	or (isMac and OSX_SHARED_LIBRARY_EXTENSIONS)
+	or UNIX_SHARED_LIBRARY_EXTENSION
+
 local bindings = ffi.load("mongoose" .. "." .. expectedFileExtension)
 
 local mongoose = {}
