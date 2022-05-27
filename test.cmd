@@ -1,1 +1,1 @@
-evo run_tests.lua
+evo tests/run-all-tests.lua
