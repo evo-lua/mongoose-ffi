@@ -59,10 +59,17 @@ TODO
 
 0. Install nasm perl etc following the openssl docs
 1. Clone OpenSSL with git clone --recursive flag
-2. Configure by following their instructions
+2. Configure by following their instructions; ; IMPORTANT: you MUST pass the ``no-shared`` flag during the configure step to generate static libraries that can be used to generate a standalone mongoose.dll to be loaded from Lua
 3. build for your desired architecture using vs dev shell
 4. copy libcrypto.lib and libssl.lib in the root folder of mongoose-ffi
 5. run make.cmd, hopefully it should work
+
+The final ``mongoose.dll`` should have the following properties:
+
+* Filze size about 4.2KB on Windows 10 (x64)
+* Embeds all the SSL functions, so that no external openssl DLL will be required
+* Exports all the mongoose functionality (API from their website/``mongoose.def``), can use ``peview`` to verify
+* Can be loaded via ``ffi.load`` without any other dependencies
 
 ## How to: Integrate with libuv's Event Loop
 
