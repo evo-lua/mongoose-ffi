@@ -123,7 +123,7 @@ end
 
 
 function scenario:OnEvaluate()
-	-- Heavily implied: "... without segfaulting" (the actual implementation doesn't need separate tests here)
+	-- Heavily implied: "... without segfaulting" (the actual implementation doesn't need testing here)
 	assertEquals(self.api.ComputeChecksum(), nil, "Should return nil if no data is passed")
 	assertEquals(self.api.ComputeChecksum(print), nil, "Should return nil if a function value is passed")
 	assertEquals(self.api.ComputeChecksum(42), nil, "Should return nil if a number value is passed")
