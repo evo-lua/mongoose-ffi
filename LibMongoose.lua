@@ -1,9 +1,10 @@
 local mongoose = _G.import("./mongoose.lua")
 local bindings = mongoose.bindings
 
+local ffi = require("ffi")
+
 local function test()
 
-	local ffi = require("ffi")
 
 	local function onMongooseEventCallbackFunction(connection, eventID, eventData, userData)
 		print("OnMongooseEvent", tonumber(connection.id), tonumber(eventID))
@@ -54,16 +55,25 @@ function LibMongoose:CreateHttpServer()
 	return server
 end
 
-function LibMongoose:CreateHttpsServer() end
-function LibMongoose:CreateWebSocketServer() end
-function LibMongoose:CreateSecureWebSocketServer() end
-function LibMongoose:CreateHttpServer() end
-function LibMongoose:EncodeBase64() end
-function LibMongoose:DecodeBase64() end
-function LibMongoose:EncodeMD5() end
-function LibMongoose:DecodeMD5() end
-function LibMongoose:EncodeSHA1() end
-function LibMongoose:DecodeSHA1() end
-function LibMongoose:ComputeChecksum() end
+function LibMongoose.CreateHttpsServer() end
+function LibMongoose.CreateWebSocketServer() end
+function LibMongoose.CreateSecureWebSocketServer() end
+function LibMongoose.CreateHttpServer() end
+function LibMongoose.EncodeBase64() end
+function LibMongoose.DecodeBase64() end
+function LibMongoose.EncodeMD5() end
+function LibMongoose.DecodeMD5() end
+function LibMongoose.EncodeSHA1() end
+function LibMongoose.DecodeSHA1() end
+
+function LibMongoose.ComputeChecksum(luaString)
+
+	if type(luaString) ~= "string" then return end
+
+	-- char data[] = "hello";
+	-- uint32_t crc = mg_crc32(0, data, sizeof(data));
+	local checksum = bindings.mg_crc32(0, luaString, #luaString)
+	return checksum
+end
 
 return LibMongoose

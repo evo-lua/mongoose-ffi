@@ -1,7 +1,7 @@
 local testSuite = TestSuite:Construct("High-Level Lua Bindings")
 
 local listOfScenarioFilesToLoad = {
-	-- "./scenarios/accessing-c-functions.lua",
+	"./scenarios/computing-crc32-checksums.lua",
 	-- "./scenarios/accessing-event-names.lua"
 }
 
