@@ -126,7 +126,7 @@ function scenario:OnEvaluate()
 	-- Heavily implied: "... without segfaulting" (the actual implementation doesn't need separate tests here)
 	assertEquals(self.api.ComputeChecksum(), nil, "Should return nil if no data is passed")
 	assertEquals(self.api.ComputeChecksum(print), nil, "Should return nil if a function value is passed")
-	assertEquals(self.api.ComputeChecksum(print), nil, "Should return nil if a number value is passed")
+	assertEquals(self.api.ComputeChecksum(42), nil, "Should return nil if a number value is passed")
 	assertEquals(self.api.ComputeChecksum("Hello World!"), 472456355, "Should be able to compute the checksum for a Lua string")
 end
 
