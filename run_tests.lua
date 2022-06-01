@@ -8,7 +8,6 @@ local TestSuite = {
 		"CreateHttpsServer",
 		"CreateWebSocketServer",
 		"CreateSecureWebSocketServer",
-		"CreateHttpServer",
 		"EncodeBase64",
 		"DecodeBase64",
 		"EncodeMD5",

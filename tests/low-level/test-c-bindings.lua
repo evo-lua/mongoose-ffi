@@ -7,13 +7,4 @@ local listOfScenarioFilesToLoad = {
 
 testSuite:AddScenarios(listOfScenarioFilesToLoad)
 
--- function testSuite:TestLowLevelBindings()
--- 	print("TEST\tmongoose.lua (low-level bindings)")
-
--- 	self:TestEventConstantsAreExported()
--- 	self:TestLowLevelApiSurface()
-
--- 	print("OK\tmongoose.lua (low-level bindings)\n")
--- end
-
 return testSuite
