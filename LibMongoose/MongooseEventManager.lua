@@ -8,7 +8,7 @@ local MongooseEventManager = {
 	DEFAULT_HOST_NAME = "localhost",
 }
 
-function MongooseEventManager:Construct()
+function MongooseEventManager:Construct(pollingTimeout)
 	local instance = {}
 
 	local inheritanceMetatable = {
@@ -23,6 +23,7 @@ function MongooseEventManager:Construct()
 	instance.protocol = "invalid" -- For easier debugging
 	instance.url = ""
 	instance.isListening = false
+	self.pollingTimeout = pollingTimeout or 20
 
 	setmetatable(instance, inheritanceMetatable)
 
@@ -53,7 +54,7 @@ function MongooseEventManager:StartListening(port, host)
 	-- local pollingTask =
 	prepare:start(function()
 	--   print("Before I/O polling")
-	  mongoose.bindings.mg_mgr_poll(self.mg_mgr, 3000);
+	  mongoose.bindings.mg_mgr_poll(self.mg_mgr, self.pollingTimeout);
 	end)
 
 	return true
