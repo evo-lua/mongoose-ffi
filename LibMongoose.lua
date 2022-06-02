@@ -1,4 +1,6 @@
-local mongoose = _G.import("./mongoose.lua")
+local mongoose = import("./mongoose.lua")
+local MongooseServer = import("./MongooseServer.lua") -- ... and client?
+
 local bindings = mongoose.bindings
 
 local ffi = require("ffi")
