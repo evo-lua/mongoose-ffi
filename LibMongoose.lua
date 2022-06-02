@@ -8,12 +8,9 @@ local bindings = mongoose.bindings
 local ffi = require("ffi")
 
 local function test()
-
-
 	local function onMongooseEventCallbackFunction(connection, eventID, eventData, userData)
 		print("OnMongooseEvent", tonumber(connection.id), tonumber(eventID))
 	end
-
 
 	local mongooseEventManager = ffi.new("struct mg_mgr");
 	mongoose.bindings.mg_mgr_init(mongooseEventManager);
@@ -23,7 +20,6 @@ local function test()
 	end
 
 end
-
 
 local LibMongoose = {
 	reusableMd5Context = ffi.new("mg_md5_ctx"),
@@ -38,7 +34,6 @@ function LibMongoose:CreateHttpServer()
 
 	return server
 end
-
 
 function LibMongoose.CreateHttpsServer() end
 function LibMongoose.CreateWebSocketServer() end

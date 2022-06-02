@@ -29,6 +29,8 @@ function MongooseEventManager:Construct()
 	return instance
 end
 
+local uv = require("uv")
+
 function MongooseEventManager:StartListening(port, host)
 
 	-- TODO tests for using defaults, tests for passing non number args
@@ -37,7 +39,20 @@ function MongooseEventManager:StartListening(port, host)
 
 	-- todo missing args, concat errors
 	self.url = self.protocol .. "://" .. host .. ":" .. port
+
+	-- To pass self (C doesn't do that obviously)
+	local function onEventWrapper(...)
+		self:OnEvent(...)
+	end
+	mongoose.bindings.mg_listen(self.mg_mgr, self.url, onEventWrapper, nil);
 	self.isListening = true
+
+	local prepare = uv.new_idle()
+	-- local pollingTask =
+	prepare:start(function()
+	  print("Before I/O polling")
+	  mongoose.bindings.mg_mgr_poll(self.mg_mgr, 1000);
+	end)
 
 	return true
 end
@@ -54,5 +69,21 @@ end
 function MongooseEventManager:GetURL()
 	return self.url
 end
+
+function MongooseEventManager:OnEvent(connection, eventID, eventData, userData)
+	local eventName = mongoose.events[eventID]
+	EVENT("Connection #" .. tonumber(connection.id) .. ": " .. eventName)
+	print("OnEvent", eventName, tonumber(connection.id), tonumber(eventID))
+
+	if eventName == "MG_EV_ERROR" then self:OnError(connection, eventData) end
+end
+
+function MongooseEventManager:OnError(connection, errorMessage)
+
+	print(errorMessage)
+	EVENT("OnError for connection #"  .. tonumber(connection.id))
+	-- EVENT("OnError for connection #"  .. tonumber(connection.id) .. " (Message: " .. ffi.string(errorMessage) .. ")")
+end
+
 
 return MongooseEventManager
