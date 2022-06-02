@@ -1,5 +1,7 @@
+local MongooseEventManager = import("./LibMongoose/MongooseEventManager.lua")
+local TcpServer = import("./LibMongoose/TcpServer.lua")
 local mongoose = import("./mongoose.lua")
-local MongooseServer = import("./MongooseServer.lua") -- ... and client?
+-- local MongooseServer = import("./MongooseServer.lua") -- ... and client?
 
 local bindings = mongoose.bindings
 
@@ -22,31 +24,6 @@ local function test()
 
 end
 
-local HttpServer = {}
-
-function HttpServer:Construct()
-	local instance = {}
-
-	local inheritanceMetatable = {
-		__index = HttpServer
-	}
-
-	setmetatable(instance, inheritanceMetatable)
-
-	instance.__className = "HttpServer"
-
-	return instance
-end
-
-function HttpServer:IsListening()
-
-end
-
-function HttpServer:StartListening(port, host)
-	port = port or 80
-	host = host or "0.0.0.0"
-end
-
 
 local LibMongoose = {
 	reusableMd5Context = ffi.new("mg_md5_ctx"),
@@ -62,10 +39,22 @@ function LibMongoose:CreateHttpServer()
 	return server
 end
 
+
 function LibMongoose.CreateHttpsServer() end
 function LibMongoose.CreateWebSocketServer() end
 function LibMongoose.CreateSecureWebSocketServer() end
-function LibMongoose.CreateHttpServer() end
+function LibMongoose.CreateTcpServer()
+	-- 	struct mg_mgr mgr;
+	-- 	mg_mgr_init(&mgr);                                // Init manager
+	-- 	mg_listen(&mgr, "tcp://0.0.0.0:1234", cb, &mgr);  // Setup listener
+	-- 	for (;;) mg_mgr_poll(&mgr, 1000);                 // Event loop
+	-- 	mg_mgr_free(&mgr);                                // Cleanup
+	-- 	return 0;
+	--   }
+	local server = TcpServer:Construct()
+
+	return server
+end
 
 -- calculate the size of 'output' buffer required for a 'input' buffer of length x during Base64 encoding operation
 local math_ceil = math.ceil

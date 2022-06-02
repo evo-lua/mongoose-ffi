@@ -38,6 +38,18 @@ function MongooseServer:OnEvent(eventTypeID, ...)
 
 end
 
+-- OnConnectionEstablished
+-- OnConnectionDropped
+-- OnWebSocketHandshake
+-- OnConnectionUpgraded
+-- OnConnectionSecured-- OnConnectionEncrypted
+-- OnMessageSent
+-- OnRequestSent
+-- OnIncomingRequest
+-- On ... for all other relevant events?
+
+function MongooseServer:Configure(options) end
+
 function MongooseServer:Construct()
 	-- mg_mgr_init
 end
