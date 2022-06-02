@@ -72,22 +72,24 @@ local function hexStringToNumber(hexString)
 end
 
 local format = format
+local table_concat = table.concat
 
 function LibMongoose.MD5(luaString)
 	if type(luaString) ~= "string" then return end
 
 	-- Reset context without allocating more memory
 	bindings.mg_md5_init(LibMongoose.reusableMd5Context)
-
 	bindings.mg_md5_update(LibMongoose.reusableMd5Context, luaString, #luaString)
 	bindings.mg_md5_final(LibMongoose.reusableMd5Context, LibMongoose.reusableMd5OutputBuffer)
+
+	-- This seems too complicated; does Lua not offer a better way (that doesn't require extra steps)?
 	local result = LibMongoose.reusableMd5OutputBuffer
 	local hexBytes = {}
 	for index = 0, 15, 1 do
 		local character = result[index]
 		hexBytes[#hexBytes+1] = format("%02x", character)
 	end
-	return table.concat(hexBytes, "")
+	return table_concat(hexBytes, "")
 end
 
 function LibMongoose.EncodeSHA1() end
