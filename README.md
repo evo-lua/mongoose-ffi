@@ -10,14 +10,19 @@ Enable the creation of high-quality, battle-tested HTTP and WebSocket servers pr
 
 The bindings currently expose only some of the functionality that mongoose provides:
 
+* TCP server
 * HTTP server
 * WebSocket server
+* TSL Encryption (HTTPS/WSS)
+* Checksums and Hashing (MD5, SHA1, CRC32, Base64)
 
-Everything else may require some glue code; I simply haven't had a need for it and so it's not yet implemened.
+Other APIs may require glue code; I simply haven't had a need for more and so it's not yet implemened.
 
 ## Requirements
 
 LuaJIT FFI, Win, Unix officially supported. Everything else should also work, but I can't test it on my machine.
+
+Built for use with the [evo](https://github.com/evo-lua/evo) runtime, but with minor adaptation (``import``  statements) you should be able to use it with LuaJIT, Luvit etc.
 
 ## Security
 
