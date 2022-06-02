@@ -64,8 +64,6 @@ function LibMongoose.CreateSecureWebSocketServer() end
 function LibMongoose.CreateHttpServer() end
 
 -- calculate the size of 'output' buffer required for a 'input' buffer of length x during Base64 encoding operation
--- #define B64ENCODE_OUT_SAFESIZE(x) ((((x) + 3 - 1)/3) * 4 + 1)
-
 local math_ceil = math.ceil
 local function B64ENCODE_OUT_SAFESIZE(x)
 	return math_ceil((((x) + 3 - 1)/3) * 4 + 1)
