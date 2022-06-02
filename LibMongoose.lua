@@ -63,8 +63,30 @@ function LibMongoose.CreateWebSocketServer() end
 function LibMongoose.CreateSecureWebSocketServer() end
 function LibMongoose.CreateHttpServer() end
 
-function LibMongoose.EncodeBase64() end
-function LibMongoose.DecodeBase64() end
+-- calculate the size of 'output' buffer required for a 'input' buffer of length x during Base64 encoding operation
+-- #define B64ENCODE_OUT_SAFESIZE(x) ((((x) + 3 - 1)/3) * 4 + 1)
+
+local function B64ENCODE_OUT_SAFESIZE(x)
+	return math.ceil((((x) + 3 - 1)/3) * 4 + 1)
+end
+
+-- calculate the size of 'output' buffer required for a 'input' buffer of length x during Base64 decoding operation
+-- #define B64DECODE_OUT_SAFESIZE(x) (((x)*3)/4)
+
+function LibMongoose.EncodeBase64(luaString)
+
+	if type(luaString) ~= "string" then return end
+
+	local numBytesRequired = B64ENCODE_OUT_SAFESIZE(#luaString)
+	local outputBuffer = ffi.new("char [?]", numBytesRequired)
+	bindings.mg_base64_encode(luaString, #luaString, outputBuffer)
+
+	return ffi.string(outputBuffer)
+end
+
+function LibMongoose.DecodeBase64()
+
+end
 
 local format = format
 local table_concat = table.concat
