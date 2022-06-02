@@ -46,7 +46,10 @@ function HttpServer:StartListening(port, host)
 end
 
 
-local LibMongoose = {}
+local LibMongoose = {
+	reusableMd5Context = ffi.new("mg_md5_ctx"),
+	reusableMd5OutputBuffer = ffi.new("unsigned char [?]", 16)
+}
 
 function LibMongoose:CreateHttpServer()
 
@@ -59,19 +62,40 @@ function LibMongoose.CreateHttpsServer() end
 function LibMongoose.CreateWebSocketServer() end
 function LibMongoose.CreateSecureWebSocketServer() end
 function LibMongoose.CreateHttpServer() end
+
 function LibMongoose.EncodeBase64() end
 function LibMongoose.DecodeBase64() end
-function LibMongoose.EncodeMD5() end
-function LibMongoose.DecodeMD5() end
+
+
+local function hexStringToNumber(hexString)
+
+end
+
+local format = format
+
+function LibMongoose.MD5(luaString)
+	if type(luaString) ~= "string" then return end
+
+	-- Reset context without allocating more memory
+	bindings.mg_md5_init(LibMongoose.reusableMd5Context)
+
+	bindings.mg_md5_update(LibMongoose.reusableMd5Context, luaString, #luaString)
+	bindings.mg_md5_final(LibMongoose.reusableMd5Context, LibMongoose.reusableMd5OutputBuffer)
+	local result = LibMongoose.reusableMd5OutputBuffer
+	local hexBytes = {}
+	for index = 0, 15, 1 do
+		local character = result[index]
+		hexBytes[#hexBytes+1] = format("%02x", character)
+	end
+	return table.concat(hexBytes, "")
+end
+
 function LibMongoose.EncodeSHA1() end
 function LibMongoose.DecodeSHA1() end
 
-function LibMongoose.ComputeChecksum(luaString)
-
+function LibMongoose.CRC32(luaString)
 	if type(luaString) ~= "string" then return end
 
-	-- char data[] = "hello";
-	-- uint32_t crc = mg_crc32(0, data, sizeof(data));
 	local checksum = bindings.mg_crc32(0, luaString, #luaString)
 	return checksum
 end
