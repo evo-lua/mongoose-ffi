@@ -66,12 +66,15 @@ function LibMongoose.CreateHttpServer() end
 -- calculate the size of 'output' buffer required for a 'input' buffer of length x during Base64 encoding operation
 -- #define B64ENCODE_OUT_SAFESIZE(x) ((((x) + 3 - 1)/3) * 4 + 1)
 
+local math_ceil = math.ceil
 local function B64ENCODE_OUT_SAFESIZE(x)
-	return math.ceil((((x) + 3 - 1)/3) * 4 + 1)
+	return math_ceil((((x) + 3 - 1)/3) * 4 + 1)
 end
 
 -- calculate the size of 'output' buffer required for a 'input' buffer of length x during Base64 decoding operation
--- #define B64DECODE_OUT_SAFESIZE(x) (((x)*3)/4)
+local function B64DECODE_OUT_SAFESIZE(x)
+	return math_ceil(((x)*3)/4)
+end
 
 function LibMongoose.EncodeBase64(luaString)
 
@@ -84,8 +87,14 @@ function LibMongoose.EncodeBase64(luaString)
 	return ffi.string(outputBuffer)
 end
 
-function LibMongoose.DecodeBase64()
+function LibMongoose.DecodeBase64(base64EncodedString)
+	if type(base64EncodedString) ~= "string" then return end
 
+	local numBytesRequired = B64DECODE_OUT_SAFESIZE(#base64EncodedString)
+	local outputBuffer = ffi.new("char [?]", numBytesRequired)
+	bindings.mg_base64_decode(base64EncodedString, #base64EncodedString, outputBuffer)
+
+	return ffi.string(outputBuffer)
 end
 
 local format = format

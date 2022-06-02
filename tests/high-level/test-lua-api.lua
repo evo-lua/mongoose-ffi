@@ -4,6 +4,7 @@ local listOfScenarioFilesToLoad = {
 	"./scenarios/computing-crc32-checksums.lua",
 	"./scenarios/computing-md5-checksums.lua",
 	"./scenarios/encoding-base64-strings.lua",
+	"./scenarios/decoding-base64-strings.lua",
 	-- "./scenarios/accessing-event-names.lua"
 }
 
