@@ -48,7 +48,9 @@ end
 
 local LibMongoose = {
 	reusableMd5Context = ffi.new("mg_md5_ctx"),
-	reusableMd5OutputBuffer = ffi.new("unsigned char [?]", 16)
+	reusableSha1Context = ffi.new("mg_sha1_ctx"),
+	reusableMd5OutputBuffer = ffi.new("unsigned char [?]", 16),
+	reusableSha1OutputBuffer = ffi.new("unsigned char [?]", 20)
 }
 
 function LibMongoose:CreateHttpServer()
@@ -74,6 +76,17 @@ local function B64DECODE_OUT_SAFESIZE(x)
 	return math_ceil(((x)*3)/4)
 end
 
+local format = format
+local table_concat = table.concat
+local function CharBufferToHexString(charBuffer, numCharacters)
+	local hexBytes = {}
+	for index = 0, numCharacters - 1, 1 do
+		local character = charBuffer[index]
+		hexBytes[#hexBytes+1] = format("%02x", character)
+	end
+	return table_concat(hexBytes, "")
+end
+
 function LibMongoose.EncodeBase64(luaString)
 
 	if type(luaString) ~= "string" then return end
@@ -95,9 +108,6 @@ function LibMongoose.DecodeBase64(base64EncodedString)
 	return ffi.string(outputBuffer)
 end
 
-local format = format
-local table_concat = table.concat
-
 function LibMongoose.MD5(luaString)
 	if type(luaString) ~= "string" then return end
 
@@ -108,16 +118,22 @@ function LibMongoose.MD5(luaString)
 
 	-- This seems too complicated; does Lua not offer a better way (that doesn't require extra steps)?
 	local result = LibMongoose.reusableMd5OutputBuffer
-	local hexBytes = {}
-	for index = 0, 15, 1 do
-		local character = result[index]
-		hexBytes[#hexBytes+1] = format("%02x", character)
-	end
-	return table_concat(hexBytes, "")
+
+	return CharBufferToHexString(result, 16)
 end
 
-function LibMongoose.EncodeSHA1() end
-function LibMongoose.DecodeSHA1() end
+function LibMongoose.SHA1(luaString)
+	if type(luaString) ~= "string" then return end
+
+	-- Reset context without allocating more memory
+	bindings.mg_sha1_init(LibMongoose.reusableSha1Context)
+	bindings.mg_sha1_update(LibMongoose.reusableSha1Context, luaString, #luaString)
+	bindings.mg_sha1_final(LibMongoose.reusableSha1OutputBuffer, LibMongoose.reusableSha1Context)
+
+	local result = LibMongoose.reusableSha1OutputBuffer
+
+	return CharBufferToHexString(result, 20)
+end
 
 function LibMongoose.CRC32(luaString)
 	if type(luaString) ~= "string" then return end
