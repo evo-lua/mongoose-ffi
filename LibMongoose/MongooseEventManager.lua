@@ -40,6 +40,8 @@ function MongooseEventManager:StartListening(port, host)
 	-- todo missing args, concat errors
 	self.url = self.protocol .. "://" .. host .. ":" .. port
 
+	DEBUG("Started listening at URL: " .. self.url)
+
 	-- To pass self (C doesn't do that obviously)
 	local function onEventWrapper(...)
 		self:OnEvent(...)
@@ -50,7 +52,7 @@ function MongooseEventManager:StartListening(port, host)
 	local prepare = uv.new_idle()
 	-- local pollingTask =
 	prepare:start(function()
-	  print("Before I/O polling")
+	--   print("Before I/O polling")
 	  mongoose.bindings.mg_mgr_poll(self.mg_mgr, 3000);
 	end)
 
@@ -112,7 +114,9 @@ function MongooseEventManager:OnError(connection, error_message)
 end
 
 function MongooseEventManager:OnUpdate(connection, milliseconds)
-	EVENT("SOCKET_CONNECTION_UPDATED", tonumber(connection.id), tonumber(milliseconds))
+	-- milliseconds = ffi.cast("uint64_t", milliseconds)
+	-- print(milliseconds)
+	-- EVENT("SOCKET_CONNECTION_UPDATED", tonumber(connection.id), tonumber(milliseconds))
 end
 
 function MongooseEventManager:OnConnectionCreated(connection)
