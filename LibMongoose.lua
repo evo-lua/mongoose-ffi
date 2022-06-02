@@ -66,11 +66,6 @@ function LibMongoose.CreateHttpServer() end
 function LibMongoose.EncodeBase64() end
 function LibMongoose.DecodeBase64() end
 
-
-local function hexStringToNumber(hexString)
-
-end
-
 local format = format
 local table_concat = table.concat
 
