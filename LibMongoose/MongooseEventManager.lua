@@ -8,7 +8,7 @@ local MongooseEventManager = {
 	DEFAULT_HOST_NAME = "localhost",
 }
 
-function MongooseEventManager:Construct(pollingTimeout)
+function MongooseEventManager:Construct(protocol)
 	local instance = {}
 
 	local inheritanceMetatable = {
@@ -20,10 +20,9 @@ function MongooseEventManager:Construct(pollingTimeout)
 	instance.mg_mgr = mongooseEventManager
 
 	-- Has to be set by the individual server APIs
-	instance.protocol = "invalid" -- For easier debugging
+	instance.protocol = protocol or "invalid" -- For easier debugging
 	instance.url = ""
 	instance.isListening = false
-	self.pollingTimeout = pollingTimeout or 20
 
 	setmetatable(instance, inheritanceMetatable)
 
@@ -50,12 +49,19 @@ function MongooseEventManager:StartListening(port, host)
 	mongoose.bindings.mg_listen(self.mg_mgr, self.url, onEventWrapper, nil);
 	self.isListening = true
 
-	local prepare = uv.new_idle()
-	-- local pollingTask =
-	prepare:start(function()
-	--   print("Before I/O polling")
-	  mongoose.bindings.mg_mgr_poll(self.mg_mgr, self.pollingTimeout);
-	end)
+	C_EventLoop.ScheduleAsyncTask(
+		function()
+			-- The timeout is handled by the event loop
+			mongoose.bindings.mg_mgr_poll(self.mg_mgr, 1);
+		end
+	)
+
+	-- local prepare = uv.new_idle()
+	-- -- local pollingTask =
+	-- prepare:start(function()
+	-- --   print("Before I/O polling")
+	--   mongoose.bindings.mg_mgr_poll(self.mg_mgr, self.pollingTimeout);
+	-- end)
 
 	return true
 end
@@ -71,6 +77,14 @@ end
 
 function MongooseEventManager:GetURL()
 	return self.url
+end
+
+function MongooseEventManager:Send(connection, dataToSend)
+	-- TODO use data arg
+	-- mg_send(c, c->recv.buf, c->recv.len);     // Echo received data back
+	-- mg_iobuf_del(&c->recv, 0, c->recv.len);   // And discard it
+	mongoose.bindings.mg_send(connection, connection.recv.buf, connection.recv.len)
+	mongoose.bindings.mg_iobuf_del(connection.recv, 0, connection.recv.len)
 end
 
 function MongooseEventManager:OnEvent(connection, eventID, eventData, userData)
@@ -142,7 +156,9 @@ function MongooseEventManager:OnDataReceived(connection, mg_str)
 end
 
 function MongooseEventManager:OnDataWritten(connection, bytes_written)
-	EVENT("SOCKET_DATA_WRITTEN", tonumber(connection.id), tonumber(bytes_written))
+	local dereferencedPointerValue = ffi.cast("long*", bytes_written)[0]
+	local numBytesSent = tonumber(dereferencedPointerValue) - 1 -- Ignore null terminator since it's always present
+	EVENT("SOCKET_DATA_WRITTEN", tonumber(connection.id), numBytesSent)
 end
 
 function MongooseEventManager:OnConnectionClosed(connection)
