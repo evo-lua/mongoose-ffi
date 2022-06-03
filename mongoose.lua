@@ -133,7 +133,7 @@ mongoose.cdefs = [[
 		 mg_event_handler_t fn, void *fn_data);
 		struct mg_connection *mg_wrapfd(struct mg_mgr *mgr, int fd,
 		mg_event_handler_t fn, void *fn_data);
-		bool mg_send(struct mg_connection *, const void *, size_t);
+		bool mg_send(struct mg_connection *, const void * buf, size_t len);
 		size_t mg_printf(struct mg_connection *, const char *fmt, ...);
 		size_t mg_vprintf(struct mg_connection *, const char *fmt, va_list ap);
 		char *mg_straddr(struct mg_addr *, char *, size_t);
