@@ -5,7 +5,7 @@ local MongooseEventManager = import("./MongooseEventManager.lua")
 local TcpServer = {}
 
 function TcpServer:Construct()
-	local instance = MongooseEventManager:Construct()
+	local instance = MongooseEventManager:Construct("tcp")
 
 	local inheritanceLookupMetatable = {
 		__index = function(t, v)
@@ -18,12 +18,18 @@ function TcpServer:Construct()
 			end
 		end
 	}
-	-- Override defaults since the prototype has to be generic (and less specific)
-	instance.protocol = "tcp"
 
 	setmetatable(instance, inheritanceLookupMetatable)
 
 	return instance
+end
+
+function TcpServer:OnDataReceived(connection, mg_str)
+
+	self:Send(connection, mg_str) -- todo
+
+		-- mg_send(c, c->recv.buf, c->recv.len);     // Echo received data back
+		-- mg_iobuf_del(&c->recv, 0, c->recv.len);   // And discard it
 end
 
 return TcpServer
