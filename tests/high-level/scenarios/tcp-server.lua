@@ -19,6 +19,13 @@ function scenario:OnEvaluate()
 	-- assertTrue(server:StartListening(), "Should be able to start the server with a default port and host name")
 	assertTrue(server:IsListening(), "Should be able to start the server manually")
 
+	assertFalse(server:IsEchoServer(), "Should turn echo server mode OFF by default")
+	server:EnableEchoServerMode()
+	assertTrue(server:IsEchoServer(), "Should be able to turn echo server mode ON")
+	server:DisableEchoServerMode()
+	assertFalse(server:IsEchoServer(), "Should be able to turn echo server mode OFF")
+
+
 	local expectedURL = "tcp://127.0.0.1:1234"
 	assertEquals(server:GetURL(), expectedURL, "Should use the configured port and host")
 

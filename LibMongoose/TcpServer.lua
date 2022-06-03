@@ -26,7 +26,7 @@ end
 
 function TcpServer:OnDataReceived(connection, mg_str)
 
-	self:Send(connection, mg_str) -- todo
+	if self.isEchoServer then self:EchoLastReceivedMessage(connection) end
 
 		-- mg_send(c, c->recv.buf, c->recv.len);     // Echo received data back
 		-- mg_iobuf_del(&c->recv, 0, c->recv.len);   // And discard it

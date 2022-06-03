@@ -24,12 +24,26 @@ function MongooseEventManager:Construct(protocol)
 	instance.url = ""
 	instance.isListening = false
 
+	instance.isEchoServer = false
+
 	setmetatable(instance, inheritanceMetatable)
 
 	return instance
 end
 
 local uv = require("uv")
+
+function MongooseEventManager:EnableEchoServerMode()
+	self.isEchoServer = true
+end
+
+function MongooseEventManager:DisableEchoServerMode()
+	self.isEchoServer = false
+end
+
+function MongooseEventManager:IsEchoServer()
+	return self.isEchoServer
+end
 
 function MongooseEventManager:StartListening(port, host)
 
@@ -79,7 +93,7 @@ function MongooseEventManager:GetURL()
 	return self.url
 end
 
-function MongooseEventManager:Send(connection, dataToSend)
+function MongooseEventManager:EchoLastReceivedMessage(connection)
 	-- TODO use data arg
 	-- mg_send(c, c->recv.buf, c->recv.len);     // Echo received data back
 	-- mg_iobuf_del(&c->recv, 0, c->recv.len);   // And discard it
