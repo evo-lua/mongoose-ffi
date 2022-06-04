@@ -34,6 +34,14 @@ jobs:
         run: rm -v LATEST_VERSION_TAG curl.log
         shell: bash
 
+      - name: Prepare dependencies
+        run: prepare-dependencies.cmd
+        shell: cmd
+
+      - name: Build mongoose shared library
+        run: make.cmd
+        shell: cmd
+
       - name: Run automated tests
         run: test.cmd
         shell: cmd
