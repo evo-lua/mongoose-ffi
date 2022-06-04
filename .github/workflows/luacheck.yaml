@@ -7,16 +7,19 @@ on:
     paths-ignore:
       - "README.md"
       - .github/**
+      - "!.github/workflows/luacheck.yaml"
   pull_request:
     branches:
     - main
     paths-ignore:
       - "README.md"
       - .github/**
+      - "!.github/workflows/luacheck.yaml"
   create:
     paths-ignore:
       - "README.md"
       - .github/**
+      - "!.github/workflows/luacheck.yaml"
 
 jobs:
   build:
