@@ -4,11 +4,19 @@ on:
   push:
     branches:
     - main
+    paths-ignore:
+      - "README.md"
+      - .github/**
   pull_request:
     branches:
     - main
+    paths-ignore:
+      - "README.md"
+      - .github/**
   create:
-    # Any branch or tag
+    paths-ignore:
+      - "README.md"
+      - .github/**
 
 jobs:
   build:
