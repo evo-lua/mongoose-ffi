@@ -1,0 +1,36 @@
+name: Static Analysis
+
+on:
+  push:
+    branches:
+    - main
+  pull_request:
+    branches:
+    - main
+  create:
+    # Any branch or tag
+
+jobs:
+  build:
+    name: Lint Codebase
+    # Using Windows because it's easier to just download the binary release, without luarocks etc.
+    runs-on: windows-latest
+
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v2
+
+      - name: Fetch latest luacheck release
+        # This seems like a hacky way of getting the tag, but I haven't found a better one that "just works"
+        run: curl --location --silent --head --output curl.log -w %{url_effective} https://github.com/lunarmodules/luacheck/releases/latest | grep --only-matching tag/.* | cut -f2- -d/ | tee LATEST_LUACHECK_VERSION && cat curl.log
+        # Print everything, for easier debugging
+        shell: bash
+
+      - name: Download luacheck release
+        run: curl --location --silent --fail --output luacheck.exe https://github.com/lunarmodules/luacheck/releases/download/$(cat LATEST_LUACHECK_VERSION)/luacheck.exe && ls
+        # Output version to allow troubleshooting issues more easily if it's wrong
+        shell: bash
+
+      - name: Run luacheck linter
+        run: ./luacheck.exe .
+        shell: bash
