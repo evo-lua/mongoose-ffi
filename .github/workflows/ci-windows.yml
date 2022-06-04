@@ -1,4 +1,4 @@
-name: Automated Testing (Windows)
+name: Build Shared Library (Windows)
 
 on:
   pull_request:
@@ -14,7 +14,7 @@ on:
 jobs:
   build:
     # OSX/Unix would need a separate shell script, but that'll become obsolete once "run" scripts are implemented (=> deferred)
-    name: Test on Windows (x64)
+    name: Build on Windows (x64)
     runs-on: windows-latest
 
     steps:
