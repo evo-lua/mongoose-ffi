@@ -1,0 +1,64 @@
+name: Build Shared Library (Windows)
+
+on:
+  pull_request:
+    paths-ignore:
+      - "README.md"
+    types: [opened, synchronize, reopened, ready_for_review]
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - "README.md"
+
+jobs:
+  build:
+    # OSX/Unix would need a separate shell script, but that'll become obsolete once "run" scripts are implemented (=> deferred)
+    name: Build on Windows (x64)
+    runs-on: windows-latest
+
+    steps:
+      # OpenSSL build requires nmake; it's used by mongoose for TLS support
+      - name: Set up NASM
+        uses: ilammy/setup-nasm@v1.3.0
+
+      # Set up cl.exe (required for all build steps)
+      - name: Enable Developer Command Prompt
+        uses: ilammy/msvc-dev-cmd@v1.10.0
+
+      - name: Check out Git repository
+        uses: actions/checkout@v2
+
+      - name: Fetch latest evo version tag
+        # This seems like a hacky way of getting the tag, but I haven't found a better one that "just works"
+        run: curl --location --silent --head --output curl.log -w %{url_effective} https://github.com/evo-lua/evo/releases/latest | grep --only-matching tag/.* | cut -f2- -d/ | tee LATEST_VERSION_TAG && cat curl.log # Print everything, for easier debugging
+        shell: bash
+
+      - name: Download evo release
+        run: curl --location --silent --fail --output evo.exe https://github.com/evo-lua/evo/releases/download/$(cat LATEST_VERSION_TAG)/evo.exe &&  ls && ./evo.exe # Output version to allow troubleshooting issues more easily if it's wrong
+        shell: bash
+
+      - name: Clean up temporary files # We don't want to bloat the bundle with these
+        run: rm -v LATEST_VERSION_TAG curl.log
+        shell: bash
+
+      - name: Prepare dependencies
+        run: prepare-dependencies.cmd
+        shell: cmd
+
+      - name: Build mongoose shared library
+        run: make.cmd
+        shell: cmd
+
+      - name: Run automated tests
+        run: test.cmd
+        shell: cmd
+
+      - name: Publish new release
+        # Truly "continuous" releases may be overkill here, so better only release tagged versions
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v1
+        with:
+          files: mongoose.dll
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
