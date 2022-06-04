@@ -6,9 +6,10 @@ local isMac = (ffi.os == "OSX")
 local WINDOWS_SHARED_LIBRARY_EXTENSION = "dll"
 local OSX_SHARED_LIBRARY_EXTENSIONS = "dylib"
 local UNIX_SHARED_LIBRARY_EXTENSION = "so"
-local expectedFileExtension = (isWindows and WINDOWS_SHARED_LIBRARY_EXTENSION)
-	or (isMac and OSX_SHARED_LIBRARY_EXTENSIONS)
-	or UNIX_SHARED_LIBRARY_EXTENSION
+local expectedFileExtension =
+    (isWindows and WINDOWS_SHARED_LIBRARY_EXTENSION) or
+        (isMac and OSX_SHARED_LIBRARY_EXTENSIONS) or
+        UNIX_SHARED_LIBRARY_EXTENSION
 
 local bindings = ffi.load("mongoose" .. "." .. expectedFileExtension)
 
@@ -17,25 +18,25 @@ mongoose.bindings = bindings
 
 -- EventTypeID:FriendlyName -- Description:eventData value type (passed as first parameter to the callback)
 mongoose.events = {
-	[0] = "MG_EV_ERROR",       -- Error                        char *error_message
-	[1] = "MG_EV_OPEN",        -- Connection created           NULL
-	[2] = "MG_EV_POLL",        -- mg_mgr_poll iteration        uint64_t *milliseconds
-	[3] = "MG_EV_RESOLVE",     -- Host name is resolved        NULL
-	[4] = "MG_EV_CONNECT",     -- Connection established       NULL
-	[5] = "MG_EV_ACCEPT",      -- Connection accepted          NULL
-	[6] = "MG_EV_READ",        -- Data received from socket    struct mg_str *
-	[7] = "MG_EV_WRITE",       -- Data written to socket       long *bytes_written
-	[8] = "MG_EV_CLOSE",       -- Connection closed            NULL
-	[9] = "MG_EV_HTTP_MSG",    -- HTTP request/response        struct mg_http_message *
-	[10] = "MG_EV_HTTP_CHUNK",  -- HTTP chunk (partial msg)     struct mg_http_message *
-	[11] = "MG_EV_WS_OPEN",     -- Websocket handshake done     struct mg_http_message *
-	[12] = "MG_EV_WS_MSG",      -- Websocket msg, text or bin   struct mg_ws_message *
-	[13] = "MG_EV_WS_CTL",      -- Websocket control msg        struct mg_ws_message *
-	[14] = "MG_EV_MQTT_CMD",    -- MQTT low-level command       struct mg_mqtt_message *
-	[15] = "MG_EV_MQTT_MSG",    -- MQTT PUBLISH received        struct mg_mqtt_message *
-	[16] = "MG_EV_MQTT_OPEN",   -- MQTT CONNACK received        int *connack_status_code
-	[17] = "MG_EV_SNTP_TIME",   -- SNTP time received           uint64_t *milliseconds
-	[18] = "MG_EV_USER",        -- Starting ID for user events
+    [0] = "MG_EV_ERROR", -- Error                        char *error_message
+    [1] = "MG_EV_OPEN", -- Connection created           NULL
+    [2] = "MG_EV_POLL", -- mg_mgr_poll iteration        uint64_t *milliseconds
+    [3] = "MG_EV_RESOLVE", -- Host name is resolved        NULL
+    [4] = "MG_EV_CONNECT", -- Connection established       NULL
+    [5] = "MG_EV_ACCEPT", -- Connection accepted          NULL
+    [6] = "MG_EV_READ", -- Data received from socket    struct mg_str *
+    [7] = "MG_EV_WRITE", -- Data written to socket       long *bytes_written
+    [8] = "MG_EV_CLOSE", -- Connection closed            NULL
+    [9] = "MG_EV_HTTP_MSG", -- HTTP request/response        struct mg_http_message *
+    [10] = "MG_EV_HTTP_CHUNK", -- HTTP chunk (partial msg)     struct mg_http_message *
+    [11] = "MG_EV_WS_OPEN", -- Websocket handshake done     struct mg_http_message *
+    [12] = "MG_EV_WS_MSG", -- Websocket msg, text or bin   struct mg_ws_message *
+    [13] = "MG_EV_WS_CTL", -- Websocket control msg        struct mg_ws_message *
+    [14] = "MG_EV_MQTT_CMD", -- MQTT low-level command       struct mg_mqtt_message *
+    [15] = "MG_EV_MQTT_MSG", -- MQTT PUBLISH received        struct mg_mqtt_message *
+    [16] = "MG_EV_MQTT_OPEN", -- MQTT CONNACK received        int *connack_status_code
+    [17] = "MG_EV_SNTP_TIME", -- SNTP time received           uint64_t *milliseconds
+    [18] = "MG_EV_USER" -- Starting ID for user events
 }
 
 mongoose.cdefs = [[
