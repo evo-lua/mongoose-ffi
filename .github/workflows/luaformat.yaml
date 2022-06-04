@@ -5,6 +5,7 @@ on:
     paths-ignore:
       - "README.MD"
       - .github/**
+      - "!.github/workflows/luaformat.yaml"
     types: [opened, synchronize, reopened, ready_for_review]
   push:
     branches:
@@ -12,6 +13,12 @@ on:
     paths-ignore:
       - "README.MD"
       - .github/**
+      - "!.github/workflows/luaformat.yaml"
+  create:
+    paths-ignore:
+      - "README.md"
+      - .github/**
+      - "!.github/workflows/luaformat.yaml"
 
 jobs:
   check-format:
