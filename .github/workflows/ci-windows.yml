@@ -18,6 +18,14 @@ jobs:
     runs-on: windows-latest
 
     steps:
+      # OpenSSL build requires nmake; it's used by mongoose for TLS support
+      - name: Set up NASM
+        uses: ilammy/setup-nasm@v1.3.0
+
+      # Set up cl.exe (required for all build steps)
+      - name: Enable Developer Command Prompt
+        uses: ilammy/msvc-dev-cmd@v1.10.0
+
       - name: Check out Git repository
         uses: actions/checkout@v2
 
