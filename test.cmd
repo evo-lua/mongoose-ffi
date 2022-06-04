@@ -1,0 +1,1 @@
+evo tests/run-all-tests.lua
