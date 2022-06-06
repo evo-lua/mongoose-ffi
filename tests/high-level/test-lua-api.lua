@@ -6,6 +6,7 @@ local listOfScenarioFilesToLoad = {
 	"./scenarios/computing-sha1-checksums.lua",
 	"./scenarios/encoding-base64-strings.lua",
 	"./scenarios/decoding-base64-strings.lua",
+	"./scenarios/tcp-echo.lua",
 }
 
 testSuite:AddScenarios(listOfScenarioFilesToLoad)
