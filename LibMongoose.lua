@@ -1,6 +1,10 @@
 local MongooseEventManager = import("./LibMongoose/MongooseEventManager.lua")
 
 local Socket = import("./LibMongoose/Socket.lua")
+local HttpClient = import("./LibMongoose/HttpClient.lua")
+local HttpServer = import("./LibMongoose/HttpServer.lua")
+local WebSocketServer = import("./LibMongoose/WebSocketServer.lua")
+local HttpRequest = import("./LibMongoose/HttpRequest.lua")
 
 local mongoose = import("./mongoose.lua")
 local bindings = mongoose.bindings
@@ -14,20 +18,25 @@ local LibMongoose = {
 	reusableSha1OutputBuffer = ffi.new("unsigned char [?]", 20)
 }
 
+function LibMongoose:CreateHttpClient()
+	return HttpClient:Construct()
+end
+
 function LibMongoose:CreateSocket()
 	return Socket:Construct()
 end
 
+function LibMongoose:CreateWebSocketServer()
+	return WebSocketServer:Construct()
+end
+
 function LibMongoose:CreateHttpServer()
-
 	local server = HttpServer:Construct()
-
 	return server
 end
 
-function LibMongoose.CreateHttpsServer() end
-function LibMongoose.CreateWebSocketServer() end
-function LibMongoose.CreateSecureWebSocketServer() end
+-- function LibMongoose.CreateHttpsServer() end
+-- function LibMongoose.CreateSecureWebSocketServer() end
 -- function LibMongoose.CreateTcpServer()
 -- 	local server = Socket:Construct()
 -- 	return server
