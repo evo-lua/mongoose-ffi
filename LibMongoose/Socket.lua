@@ -1,4 +1,5 @@
 local mongoose = import("../mongoose.lua")
+local HttpMessage = import("./HttpMessage.lua")
 
 -- Upvalues
 local ffi = require("ffi")
@@ -101,7 +102,7 @@ function Socket:StartConnecting(url)
 		return
 	end
 
-	DEBUG("Starting to connect to " .. url)
+	DEBUG("Starting to connect to " .. url .. " (Socket)")
 
 	-- Needed to pass self to the Lua event handler
 	local function onEventWrapper(...)
@@ -160,11 +161,18 @@ local tonumber = tonumber
 local string_char = string.char
 local table_concat = table.concat
 
+local CountedString = import("./CountedString.lua")
+
 local function EventData_ToLuaString(eventData)
+	-- print("EventData_ToLuaString", eventData)
 	local countedString = cast("struct mg_str *", eventData)
 
-	local stringLength = tonumber(countedString.len)
-	local charBuffer = ffi.cast("char*", countedString.ptr)
+	return CountedString.ToLuaString(countedString)
+end
+
+local function Buffer_ToLuaString(ioBuffer)
+	local stringLength = tonumber(ioBuffer.len)
+	local charBuffer = ffi.cast("unsigned char*", ioBuffer.buf)
 	-- There's probably a way to do this without allocations, but the returned data should be a Lua string (usability)
 	local characters = {}
 	for index = 0, stringLength - 1, 1 do
@@ -177,7 +185,11 @@ end
 
 local function EventData_ToHttpMessage(eventData)
 	-- Pointers likely aren't the most useful, but that is TBD
-	return cast("struct mg_http_message *", eventData)
+	local httpMessageStruct = cast("struct mg_http_message *", eventData)
+
+	local message = HttpMessage:Construct(httpMessageStruct)
+
+	return message
 end
 
 local function EventData_ToWebSocketMessage(eventData)
@@ -191,9 +203,34 @@ local function EventData_LongToNumber(eventData)
 	return numBytesSent
 end
 
+local function Connection_DebugDump(connection)
+
+	print("Connection ID: " .. tonumber(connection.id))
+	print("SEND buffer size: " .. tonumber(connection.send.len))
+	print("RECV buffer size: " .. tonumber(connection.recv.len))
+	print()
+end
+
+function Socket:GetReceiveBuffer()
+	if self:IsListening() then return Buffer_ToLuaString(self.listeningConnection.recv) end
+	if self:IsConnected() then return Buffer_ToLuaString(self.outgoingConnection.recv) end
+
+	return ""
+end
+
+function Socket:GetSendBuffer()
+	if self:IsListening() then return Buffer_ToLuaString(self.listeningConnection.send) end
+	if self:IsConnected() then return Buffer_ToLuaString(self.outgoingConnection.send) end
+
+	return ""
+end
+
 function Socket:OnEvent(connection, eventID, eventData, userData)
 	local eventName = mongoose.events[eventID]
-	-- print("OnEvent", eventName, tonumber(connection.id), tonumber(eventID))
+	if eventName ~= "MG_EV_POLL" then
+		-- print("OnEvent", eventName, tonumber(connection.id), tonumber(eventID))
+		-- Connection_DebugDump(connection)
+	end
 
 	if eventName == "MG_EV_ERROR" then self:OnError(connection, eventData) end
 	if eventName == "MG_EV_OPEN" then self:OnConnectionCreated(connection) end
@@ -213,13 +250,28 @@ function Socket:OnEvent(connection, eventID, eventData, userData)
 	if eventName == "MG_EV_WS_CTL" then self:OnWebSocketControlFrameReceived(connection, EventData_ToWebSocketMessage(eventData)) end
 end
 
+function Socket:ClearReceiveBuffer(connection)
+	if not connection or not connection.recv then return end
+	connection.recv.len = 0
+end
+
+function Socket:ForceClose(connection)
+	connection.is_closing = 1
+end
+
+function Socket:Close(connection)
+	connection.is_draining = 1
+end
+
 function Socket:OnError(connection, error_message)
 
 	EVENT("SOCKET_ERROR", "Connection #"  .. tonumber(connection.id))
 
-	print(error_message)
-	print(ffi.string(error_message))
-	print(tostring(error_message))
+	-- print(error_message)
+	-- print(ffi.string(error_message))
+	-- print(tostring(error_message)) -- this one works, delete the rest
+	-- todo apis for mg_log (prints errors by default)
+	-- max recv buffer size reached
 end
 
 function Socket:OnUpdate(connection, milliseconds)
@@ -244,14 +296,14 @@ function Socket:OnConnectionAccepted(connection)
 	EVENT("SOCKET_CONNECTION_ACCEPTED", tonumber(connection.id))
 end
 
-function Socket:OnDataReceived(connection, mg_str)
-	-- TODO str
+function Socket:OnDataReceived(connection, receivedData)
 	EVENT("SOCKET_DATA_RECEIVED", tonumber(connection.id))
+	-- print(receivedData)
 end
 
-function Socket:OnDataWritten(connection, bytes_written)
-	local dereferencedPointerValue = ffi.cast("long*", bytes_written)[0]
-	local numBytesSent = tonumber(dereferencedPointerValue) - 1 -- Ignore null terminator since it's always present
+function Socket:OnDataWritten(connection, numBytesSent)
+	-- local dereferencedPointerValue = ffi.cast("long*", bytes_written)[0]
+	-- local numBytesSent = tonumber(dereferencedPointerValue) - 1 -- Ignore null terminator since it's always present
 	EVENT("SOCKET_DATA_WRITTEN", tonumber(connection.id), numBytesSent)
 end
 
