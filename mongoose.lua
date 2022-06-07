@@ -40,6 +40,12 @@ mongoose.events = {
 }
 
 mongoose.cdefs = [[
+	struct mg_str {
+		const char *ptr;  // Pointer to string data
+		size_t len;       // String len
+	  };
+
+	struct mg_str mg_str_s(const char *s);
 		struct mg_addr {
 			uint16_t port;    // TCP or UDP port in network byte order
 			uint32_t ip;      // IP address in network byte order
@@ -53,7 +59,24 @@ mongoose.cdefs = [[
 			size_t len;          // Current number of bytes
 		  };
 
-		  typedef void (*mg_event_handler_t)(struct mg_connection *, int ev,
+		struct mg_http_header {
+			struct mg_str name;   // Header name
+			struct mg_str value;  // Header value
+		};
+
+		struct mg_http_message {
+			struct mg_str method, uri, query, proto;             // Request/response line
+			struct mg_http_header headers[40];  // Headers
+			struct mg_str body;                                  // Body
+			struct mg_str message;                               // Request line + headers + body
+		  };
+
+		struct mg_ws_message {
+			struct mg_str data; // Websocket message data
+			uint8_t flags;      // Websocket message flags
+		};
+
+		typedef void (*mg_event_handler_t)(struct mg_connection *, int ev,
 		  void *ev_data, void *fn_data);
 
 		struct mg_connection {
@@ -118,12 +141,6 @@ mongoose.cdefs = [[
 		};
 
 		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-		struct mg_str {
-			const char *ptr;  // Pointer to string data
-			size_t len;       // String len
-		  };
-		struct mg_str mg_str_s(const char *s);
 
 		void mg_mgr_poll(struct mg_mgr *, int ms);
 		void mg_mgr_init(struct mg_mgr *);
